@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>profile</title>
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="css/util.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+<!--===============================================================================================-->
+    <link rel="stylesheet" href="/Web/css/register.css">
+<!--===============================================================================================-->
+    <link rel="stylesheet" href="/Web/css/createprofile.css">
+<!--===============================================================================================-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<!--===============================================================================================-->
+
+</head>
+<body>
+    <div class="register-container">
+        <div class="inner-container contain-1">
+            <div class="picture-container">
+                <img id="profileImage" src="">
+            </div>
+        </div>
+        <div class="inner-container contain-2">
+            <span class="login100-form-title">
+                Profile
+            </span>
+            <!-- <div class="Oauth">
+                <a href="#" class="btn-face m-b-20">
+                    <i class="fa fa-facebook-official"></i>
+                    Facebook
+                </a>
+                <a href="#" class="btn-google m-b-20">
+                    <img src="images/icon-google.png" alt="GOOGLE">
+                    Google
+                </a>
+            </div> -->
+            <form class="login100-form validate-form updateprofile" id="form" action="post" enctype="multipart/form-data">
+                <div class="flex">
+                    <div class="wrap-input100 validate-input" >
+                        <input class="input100 surname" type="text" name="surname" id="surname" placeholder="Surname" required aria-required="true">
+                        <!-- <span class="focus-input100"></span> -->
+                        <span class="material-symbols-outlined symbol-input100"> badge </span>    
+                    </div>
+    
+                    <div class="wrap-input100 validate-input">
+                        <input class="input100 firstname" type="text" name="firstname" id="firstname" placeholder="Firstname" required aria-required="true">
+                        <span class="material-symbols-outlined symbol-input100"> badge </span>
+                    </div>
+                </div>
+
+                <div class="flex">
+                    <div class="wrap-input100 validate-input">
+                        <input class="input100 phonenumber" type="tel" name="phonenumber" id="phonenumber" placeholder="Phone number" required aria-required="true">
+                        <span class="material-symbols-outlined symbol-input100">smartphone</span>
+                        <p id="phonenumber-error"></p>
+                    </div>
+    
+                    <div class="wrap-input100 validate-input">
+                        <input class="input100 address" type="text" name="address" id="address" placeholder="Address" required aria-required="true">
+                        <span class="material-symbols-outlined symbol-input100">home</span>
+
+                    </div>
+                </div>
+
+<!--==========================================Age and Profile Pics======================================-->
+               <div class="flex">
+                <div class="wrap-input100 validate-input">
+                    <input class="input100 age" type="date" id="age" placeholder="Dob" required aria-required="true">
+                    <p id="error"></p>
+                </div>
+
+                
+                <div class="wrap-input100 validate-input">
+                    <input class="input100 Profilepics" type="file" id="profilePicInput"  required aria-required="true">
+                    <span class="symbol-input100">
+                    </span>
+                </div>
+               </div>
+
+                <div class="flex">
+                    <div class="wrap-input100 validate-input" required aria-required="true">
+                        <select class="input100" id="gender">
+                            <option value="" disabled selected>Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Non-Binary">Non-Binary</option>
+                            <option value="Other">Other</option>
+                            <option value="Prefer not to say">Prefer not to say</option>
+                        </select>
+                        <span class="material-symbols-outlined symbol-input100">wc</span>
+
+                        </div>
+        
+                        <div class="wrap-input100 validate-input">
+                            <select class="input100" id="occupation">
+                                <option value="" disabled selected>Select Occupation</option>
+                                <option value="Student">Student</option>
+                                <option value="Engineer">Engineer</option>
+                                <option value="Doctor">Doctor</option>
+                                <option value="Teacher">Teacher</option>
+                                <option value="Businessperson">Business person</option>
+                                <option value="Artist">Artist</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span class="material-symbols-outlined symbol-input100">work</span>
+
+                            <p id="error"></p>
+                        </div>
+                </div>
+                
+                <!--======================================================Next of Kin===============================================-->
+                <div class="flex">
+                    <div class="wrap-input100 validate-input">
+                        <input class="input100 password" type="text" name="fullnamenok" id="fullnamenok" placeholder="Fullname" required aria-required="true">
+                        <span class="material-symbols-outlined symbol-input100">id_card</span>
+
+                    </div>
+    
+                    <div class="wrap-input100 validate-input">
+                        <input class="input100 password" type="tel" name="nokphonenumber" id="nokphonenumber" placeholder="NOK's Phone number" required aria-required="true">
+                        <span class="material-symbols-outlined symbol-input100">phone</span>
+
+                        <p id="phonenumber-error"></p>
+                    </div>
+                </div>
+                
+                
+                <div class="container-login100-form-btn" >
+                    <button class="login100-form-btn" type = "submit" id="reg-btn">
+                        Update
+                    </button>
+                </div>
+            </form> 
+        </div>   
+    </div>
+    <script src="js/profile.js"></script>
+    <script src="js/dashboard.js"></script>
+
+</body>
+</html>
