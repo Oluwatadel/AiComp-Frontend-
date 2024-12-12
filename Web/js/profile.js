@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const nokPhonenumber = document.querySelector("#nokphonenumber");
     const submitBtn = document.querySelector("#reg-btn");
     const form = document.querySelector("#form");
+    const errorDisplay = document.querySelector("#error");
 
 
     form.addEventListener("submit", async (e) =>{
@@ -60,10 +61,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         })
         .then(data => {
             console.log(data.message);
-            location.href = "dashboard";
-
+            location.href = "/Web/dashboard.html";
         })
         .catch(error => {
+            errorDisplay.textContent = error.message;
+            errorDisplay.style.color = "red";
             console.error("Error:", error.message); // Log any error that occurs
         });
 

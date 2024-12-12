@@ -4,7 +4,8 @@ const profileClick = document.querySelector("#profile-display");
 profileClick.addEventListener("click", async () =>{
     console.log("Enter the profile");   
     await loadProfileTemplate('/Web/templates/profile-template.html');
-            
+    populateProfileTemplate();         
+
 
 })
 
@@ -15,14 +16,13 @@ async function loadProfileTemplate(templatePath)
     const main = document.querySelector("main");
     const right = document.querySelector(".right");
 
-    fetch(templatePath)
+    await fetch(templatePath)
         .then(response => response.text())
         .then(html => {
             container.style.gridTemplateColumns = "14rem auto";
             main.innerHTML = "";
             main.innerHTML = html;
             const date = document.querySelector("#date");
-            populateProfileTemplate();
             date.value = dateTime();
             
         })
@@ -32,7 +32,7 @@ async function loadProfileTemplate(templatePath)
 
 async function populateProfileTemplate () {
     
-    const profileImage = document.querySelector("profile-pics-img");
+    const profileImage = document.querySelector("#profile-img");
     const email = document.querySelector("#email");
     const phonenumber = document.querySelector("#phonenumber");
     const nokFullName = document.querySelector("#nok-fullName");
@@ -41,19 +41,28 @@ async function populateProfileTemplate () {
     const gender = document.querySelector("#gender");
     const occupation = document.querySelector("#occupation");
     const address = document.querySelector("#address");
+    const userFullName = document.querySelector("#fullname");
     
     let profile = await getProfile();
 
-    console.log(profile)
+    
 
-    profileImage.src = profile.data.profilePics;
+    profileImage.src = await getProfilePic(await getToken());
+    profileImage.style.width = "200px";
+    profileImage.style.borderRadius = "50px";
+
+
+
+    console.log(profile.data);
     email.textContent = profile.data.email;
-    phonenumber = profile.data.phoneNumber;
-    nokFullName = profile.data.fullNameNOK;
-    nokPhoneContact = profile.data.contactOfNOK
-    age = profile.data.age;
-    gender = profile.data.gender;
-    occupation = profile.data.occupation
-    address = profile.data.address
+    phonenumber.textContent = profile.data.phoneNumber;
+    nokFullName.textContent = profile.data.nokFullName;
+    console.log(nokFullName);
+    nokPhoneContact.textContent = profile.data.nokPhoneNumber
+    age.textContent = profile.data.age;
+    gender.textContent = profile.data.gender;
+    occupation.textContent = profile.data.occupation
+    address.textContent = profile.data.address
+    userFullName.textContent = `${profile.data.lastName} ${profile.data.firstName}`
 
 }

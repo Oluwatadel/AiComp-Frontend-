@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     name.textContent = profileDetails.data.firstName;   
 
     //======================================Profile pics=========================================
-    await getProfilePic(profilePics, token);
+    profilePics.src = await getProfilePic(token);
     
 
     //===============================================================================================
@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 //=====================================================================================================================
 async function getProfile(){
     let token = await getToken();
-    console.log(token);
     const resp = await fetch("https://localhost:7173/api/p/p", {
         method: "GET",
         headers: {
@@ -53,7 +52,7 @@ let getToken = async () => {
 }
 //============================================================================================================================
 
-async function getProfilePic(profilepic, token){
+async function getProfilePic(token){
     console.log(token);
     const resp = await fetch("https://localhost:7173/api/p/profilephoto", {
         method: "GET",
@@ -68,11 +67,12 @@ async function getProfilePic(profilepic, token){
         const imageBlob = await resp.blob();
         const imageUrl = await URL.createObjectURL(imageBlob);
         console.log(imageUrl);
-        profilepic.src = imageUrl;
+        return imageUrl;
     }
     else
     {
         console.error('Failed to fetch image');
+        return;
     }
 }
 

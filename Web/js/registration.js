@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
 
 
 let regResponse = async (registrationDetails) => {
-    const resp = await fetch(await completeUrl("auth/register"), {
+    const resp = await fetch("https://localhost:7173/api/auth/register", {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'

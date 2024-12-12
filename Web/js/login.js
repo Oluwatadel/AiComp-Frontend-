@@ -62,7 +62,7 @@
                         localStorage.removeItem('jwt');
                         localStorage.setItem('jwt', shareData.data.accessToken.result);
                         // console.log(`${shareData.data.accessToken.result}`);
-                        location.href ='/dashboard.html';
+                        location.href ='/Web/dashboard.html';
                         
                     }
         
