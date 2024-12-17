@@ -1,5 +1,5 @@
 //=================================onclick companion load chat===================================
-const chatTemplate = "Web/templates/chat.html";
+const chatTemplate = "./templates/chat.html";
 const chatWindow = document.querySelector(".window-chat");
 
 

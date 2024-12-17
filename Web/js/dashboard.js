@@ -11,12 +11,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     //=======================================Chat To get Mood========================================
     const chatWindow = document.querySelector(".window-chat");
     const token = await getToken();
+    console.log
 
     //===============================================================================================
     date.value = dateTime(date);
     
     //======================================Name================================================
-    let profileDetails = await getProfile();
+    let profileDetails = await getProfile(token);
     console.log(profileDetails.data);
     name.textContent = profileDetails.data.firstName;   
 
@@ -29,8 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 //=====================================================================================================================
-async function getProfile(){
-    let token = await getToken();
+async function getProfile(token){
     const resp = await fetch("https://localhost:7173/api/p/p", {
         method: "GET",
         headers: {

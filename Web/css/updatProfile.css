@@ -1,0 +1,12 @@
+.wrap-input100.validate-input {
+    display: flex;
+    justify-content: center;
+}
+
+input#profilePicInput {
+    width: 50%;
+}
+
+input#profilePicInput { 
+    padding: 1rem 2rem;
+}

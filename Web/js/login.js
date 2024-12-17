@@ -40,31 +40,54 @@
             {
                 loginForm.addEventListener("submit", async (e) => {
                     e.preventDefault();
-                    
-                    const loginObj = new URLSearchParams({
+
+                    const loginObj = {
                         email: loginUserName.value,
                         password: loginPassword.value
-                    });
+                    };
+                    
                     const shareData = await response(loginObj);
-                    console.log("Form submitted")
-                    console.log(shareData);
-        
-                    //Check if the user has a profile
-                    if(!shareData.profile){
-                        console.log("Profile is null, redirecting to profile creation.");
-                        localStorage.removeItem('jwt');
-                        localStorage.setItem('jwt', shareData.data.accessToken.result);
-                        location.href = '/Web/create-profile.html';  // Redirect to the profile creation page                
-                    } 
-                    else
+                    
+                    if(shareData.ok)
                     {
-                        console.log("Profile exists, redirecting to dashboard.");
+                        const response = await shareData.json();
+                        console.log(response)
                         localStorage.removeItem('jwt');
-                        localStorage.setItem('jwt', shareData.data.accessToken.result);
-                        // console.log(`${shareData.data.accessToken.result}`);
-                        location.href ='/Web/dashboard.html';
-                        
+                        localStorage.setItem('jwt', response.data.accessToken.result);
+                       //Check if the user has a profile
+                        if(response.profile == null){
+                            console.log("Profile is null, redirecting to profile creation.");
+                            location.href = '/Web/create-profile.html';  // Redirect to the profile creation page               
+                        } 
+                        else
+                        {
+                            console.log("Profile exists, redirecting to dashboard.");
+                            // console.log(`${shareData.data.accessToken.result}`);
+                            location.href ='/Web/dashboard.html';
+                            
+                        }
                     }
+                    else if(shareData.statusCode === 401)
+                    {
+                        emailError.textContent = shareData.message
+                    }
+        
+                    // //Check if the user has a profile
+                    // else if(shareData.profile == null){
+                    //     console.log("Profile is null, redirecting to profile creation.");
+                    //     localStorage.removeItem('jwt');
+                    //     localStorage.setItem('jwt', shareData.data.accessToken.result);
+                    //     location.href = '/Web/create-profile.html';  // Redirect to the profile creation page                
+                    // } 
+                    // else
+                    // {
+                    //     console.log("Profile exists, redirecting to dashboard.");
+                    //     localStorage.removeItem('jwt');
+                    //     localStorage.setItem('jwt', shareData.data.accessToken.result);
+                    //     // console.log(`${shareData.data.accessToken.result}`);
+                    //     location.href ='/Web/dashboard.html';
+                        
+                    // }
         
                 });
                 

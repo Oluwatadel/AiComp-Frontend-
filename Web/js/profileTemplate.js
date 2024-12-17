@@ -3,8 +3,10 @@ const profileClick = document.querySelector("#profile-display");
 //===========================================Profile================================================
 profileClick.addEventListener("click", async () =>{
     console.log("Enter the profile");   
+    const token = await getToken();
+    console.log(token);
     await loadProfileTemplate('/Web/templates/profile-template.html');
-    populateProfileTemplate();         
+    await populateProfileTemplate(token);         
 
 
 })
@@ -30,7 +32,7 @@ async function loadProfileTemplate(templatePath)
 }
 //============================================================================================================================
 
-async function populateProfileTemplate () {
+async function populateProfileTemplate (token) {
     
     const profileImage = document.querySelector("#profile-img");
     const email = document.querySelector("#email");
@@ -42,13 +44,14 @@ async function populateProfileTemplate () {
     const occupation = document.querySelector("#occupation");
     const address = document.querySelector("#address");
     const userFullName = document.querySelector("#fullname");
+    const profileEdit = document.querySelector("#profile-Edit");
     
-    let profile = await getProfile();
+    let profile = await getProfile(token);
 
     
 
-    profileImage.src = await getProfilePic(await getToken());
-    profileImage.style.width = "200px";
+    profileImage.src = await getProfilePic(token);
+    profileImage.style.width = "260px";
     profileImage.style.borderRadius = "50px";
 
 
@@ -58,11 +61,27 @@ async function populateProfileTemplate () {
     phonenumber.textContent = profile.data.phoneNumber;
     nokFullName.textContent = profile.data.nokFullName;
     console.log(nokFullName);
-    nokPhoneContact.textContent = profile.data.nokPhoneNumber
-    age.textContent = profile.data.age;
+    nokPhoneContact.textContent = profile.data.nokPhoneNumber;
+
+    const dob = new Date(profile.data.age);
+    age.textContent = `${dob.getFullYear()}-${(dob.getMonth() + 1).toString().padStart(2, '0')}-${dob.getDate().toString().padStart(2, '0')}`;
+
     gender.textContent = profile.data.gender;
     occupation.textContent = profile.data.occupation
     address.textContent = profile.data.address
     userFullName.textContent = `${profile.data.lastName} ${profile.data.firstName}`
+
+    profileEdit.addEventListener("click", async () => {
+        location.href = "./update-profile.html";
+    })
+
+
+    function CalculateAge(dob)
+    {
+        const today = new Date();
+        const birthYear = today.getFullYear() - dob;
+
+        return formattedDate;
+    }
 
 }
