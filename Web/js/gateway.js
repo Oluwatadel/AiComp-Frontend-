@@ -13,7 +13,7 @@ let response = async (loginDetails) => {
 }
 
 
-// let completeUrl =  () => {
+// let completeUrl =    () => {
 //     return `${baseUrl}`
 // }
 

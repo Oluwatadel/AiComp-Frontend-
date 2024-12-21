@@ -2,9 +2,7 @@ const profileClick = document.querySelector("#profile-display");
 
 //===========================================Profile================================================
 profileClick.addEventListener("click", async () =>{
-    console.log("Enter the profile");   
     const token = await getToken();
-    console.log(token);
     await loadProfileTemplate('/Web/templates/profile-template.html');
     await populateProfileTemplate(token);         
 
@@ -54,13 +52,9 @@ async function populateProfileTemplate (token) {
     profileImage.style.width = "260px";
     profileImage.style.borderRadius = "50px";
 
-
-
-    console.log(profile.data);
     email.textContent = profile.data.email;
     phonenumber.textContent = profile.data.phoneNumber;
     nokFullName.textContent = profile.data.nokFullName;
-    console.log(nokFullName);
     nokPhoneContact.textContent = profile.data.nokPhoneNumber;
 
     const dob = new Date(profile.data.age);

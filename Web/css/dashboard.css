@@ -563,7 +563,31 @@ main .recent-logs a {
   border-radius: 50%;
   position: absolute;
   bottom: -31px;
-  right: 54px;
+  /* right: 54px; */
+}
+
+#message-left{
+  padding-left: 27px;
+}
+
+img#right-img {
+  right: 1px;
+  bottom: 3px;
+}
+
+img#left-img {
+  bottom: 10px;
+  left: 0.5px;
+}
+
+#timespan-left
+{
+  left: 0px;
+}
+
+#timespan-right
+{
+  right: 2px;
 }
 
 /* Chat Input */
