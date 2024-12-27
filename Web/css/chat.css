@@ -112,6 +112,7 @@ body {
 
 .mainmessage img {
   width: 40px;
+    border-radius: 51%;
 }
 
 .right-chatImg,

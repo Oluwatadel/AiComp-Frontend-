@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const messageInput = document.querySelector("#message-input");
     const send = document.querySelector("#send-btn");
 
-    
+
 
 
     try {
@@ -37,22 +37,28 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Fetch daily mood messages
         await fetchMoodMessages(token, profPics, chatWindow);
-        send.addEventListener("click", () => {
-            handleSend(messageInput, token);
-        });
 
-        messageInput.addEventListener("keydown", (event) => {
-            if (event.key === "Enter") {
-                event.preventDefault(); // Prevents default behavior of form submission if inside a form
-                handleSend(messageInput, token);
-            }
-        });
+        if(messageInput && send)
+        {
+            send.addEventListener("click", () => {
+                handleSend(chatWindow, messageInput, token, profPics);
+            });
+
+            messageInput.addEventListener("keydown", (event) => {
+                if (event.key === "Enter") {
+                    event.preventDefault(); // Prevents default behavior of form submission if inside a form
+                    handleSend(chatWindow, messageInput, token, profPics);
+                }
+            });
+        }
+        else {
+            console.error("messageInput or send element not found.");
+        }
+
 
     } catch (error) {
         console.error("Error during page initialization:", error);
     }
-
-
 });
 
 //================================================== Helper Functions ============================================
@@ -131,16 +137,8 @@ async function fetchMoodMessages(token, profilePics, chatWindow) {
         chatWindow.style.height = "28vh";
 
         // Check if data exists
-        if (data.data.length > 0 && Array.isArray(data.data)) 
+        if (Array.isArray(data.data) && data.data.length > 0 )
         {
-            // const messageDiv = document.createElement("div");
-            //     messageDiv.className = "message right";
-            //     messageDiv.style.backgroundColor = "#dcf8c6";
-            //     messageDiv.style.alignSelf = "flex-end";
-            //     messageDiv.style.marginLeft = "auto";
-            //     messageDiv.style.textAlign = "left";
-            //     messageDiv.style.marginTop = "2.5rem";
-            //     messageDiv.style.marginBottom = "1.5rem";
             data.data.forEach((inf) => {
             if(inf.role == 1)
             {
@@ -157,7 +155,7 @@ async function fetchMoodMessages(token, profilePics, chatWindow) {
                 <img id="right-img" src=${profilePics} alt="" />
                 <span class="timestamp" id="timespan-right">${formatDate(inf.date)}</span>`;
 
-                messageDiv.innerHTML = message;                
+                messageDiv.innerHTML = message;
                 chatWindow.appendChild(messageDiv);
             }
             else if(inf.role == 0)
@@ -170,17 +168,16 @@ async function fetchMoodMessages(token, profilePics, chatWindow) {
                 messageDiv.style.textAlign = "left";
                 messageDiv.style.marginBottom = "1.5rem";
 
-                
                 messageDiv.innerHTML = `<p id="message-left">${inf.messageContent}</p>
                 <img id="left-img" src="./images/AiComp.png" alt="" />
                 <span class="timestamp" id="timespan-left">${formatDate(inf.date)}</span>`;
 
-                
+
                 // messageTag.style.color = "black";
 
-                
+
                 chatWindow.appendChild(messageDiv);
-            }         
+            }
             });
             const question = await getMoodQuestion(token);
             if(question.status == "Error" || question.status == "Unsuccessful")
@@ -194,7 +191,6 @@ async function fetchMoodMessages(token, profilePics, chatWindow) {
                 errorMessage.style.textAlign = "center";
 
             }
-            console.log(question);
             if(question && question.data && question.data.question)
             {
                 const questionData = question.data;
@@ -209,23 +205,55 @@ async function fetchMoodMessages(token, profilePics, chatWindow) {
                 <img id="left-img" src="./images/AiComp.png" alt="" />
                 <span class="timestamp" id="timespan-left">${formatDate(questionData.timestamp)}</span>`;
             }
+
+            if(data.data.length == 8)
+            {
+                const returnedResult = AnalyseUsersMood(token);
+                if(returnedResult)
+                {
+                    const messageDiv = document.createElement("div");
+                    messageDiv.className = "message left";
+                    messageDiv.style.backgroundColor = "#fff";
+                    messageDiv.style.alignSelf = "flex-start";
+                    messageDiv.style.marginRight = "auto";
+                    messageDiv.style.textAlign = "left";
+                    messageDiv.style.marginBottom = "1.5rem";
+                    messageDiv.innerHTML = `<p id="message-left">${returnedResult.question}</p>
+                        <img id="left-img" src="./images/AiComp.png" alt="" />
+                        <span class="timestamp" id="timespan-left">${formatDate(new Date())}</span>`;
+                    chatWindow.appendChild(messageDiv)
+                }
+            }
         }
-        else 
+        else
         {
-            console.log("No messages found for today.");
-            const question = await getMoodQuestion(token);
-            const questionData = question.data
-            console.log(question);
-            const messageDiv = document.createElement("div");
-            messageDiv.className = "message left";
-            messageDiv.style.backgroundColor = "#fff";
-            messageDiv.style.alignSelf = "flex-start";
-            messageDiv.style.marginRight = "auto";
-            messageDiv.style.textAlign = "left";
-            messageDiv.style.marginBottom = "1.5rem";
-            messageDiv.innerHTML = `<p id="message-left">${questionData.question}</p>
-            <img id="left-img" src="./images/AiComp.png" alt="" />
-            <span class="timestamp" id="timespan-left">${formatDate(questionData.timestamp)}</span>`;
+            try
+            {
+                const question = await getMoodQuestion(token);
+                const questionData = question.data
+                // console.log(question);
+                const messageDiv = document.createElement("div");
+                messageDiv.className = "message left";
+                messageDiv.style.backgroundColor = "#fff";
+                messageDiv.style.alignSelf = "flex-start";
+                messageDiv.style.marginRight = "auto";
+                messageDiv.style.textAlign = "left";
+                messageDiv.style.marginBottom = "1.5rem";
+                messageDiv.innerHTML = `<p id="message-left">${questionData}</p>
+                <img id="left-img" src="./images/AiComp.png" alt="" />
+                <span class="timestamp" id="timespan-left">${formatDate(new Date())}</span>`;
+                chatWindow.appendChild(messageDiv);
+            }
+            catch (error)
+            {
+                const questionErrorMessage = error;
+                const errorMessage = document.createElement("p");
+                errorMessage.id="error-message";
+                errorMessage.textContent = `${questionErrorMessage}`;
+                chatWindow.appendChild(errorMessage);
+                errorMessage.style.color = "red";
+                errorMessage.style.textAlign = "center";
+            }
         }
     } else {
         console.error("Failed to fetch mood messages");
@@ -241,7 +269,224 @@ async function fetchMoodMessages(token, profilePics, chatWindow) {
         messageDiv.style.marginBottom = "1.5rem";
         messageDiv.innerHTML = `<p id="message-left">${questionData.question}</p>
             <img id="left-img" src="./images/AiComp.png" alt="" />
-            <span class="timestamp" id="timespan-left">${formatDate(questionData.timestamp)}</span>`
+            <span class="timestamp" id="timespan-left">${formatDate(questionData.timestamp)}</span>`;
+        chatWindow.appendChild(messageDiv);
+
+    }
+}
+
+
+
+// Helper to get the current date in yyyy-MM-dd format
+function dateTime() {
+    const newDate = new Date();
+    return newDate.toISOString().split("T")[0];
+}
+
+
+function formatDate(date)
+{
+    const newDate = new Date(date);
+    const time = newDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return time;
+
+}
+
+async function respondToMoodAnalysisQuestion(response, token)
+{
+    try
+    {
+        const data = await fetch("https://localhost:7173/api/chat/userresponse", {
+            method: "Post",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify(response)
+        });
+
+        if(!data.ok)
+        {
+            const resp = await data.json();
+            console.error("error", resp)
+            return resp;
+        }
+
+        const resp = await data.json();
+        console.log(resp);
+        return resp;
+    }
+    catch (error) {
+        console.error("An error occurred:", error);
+      }
+}
+
+
+ async function handleSend(chatWindow, messageInput, token, profPics) {
+    if(!messageInput.value)
+    {
+        const errorData = "Input cannot be empty"
+        createErrorDiv("Input cannot be empty", chatWindow);
+    }
+    else
+    {
+        const response = await respondToMoodAnalysisQuestion(messageInput.value, token);
+        console.log(response);
+
+        if (response && response.status == "Unsuccessful" &&
+            (response.message == "Today's mood has been analysed! Come back tomorrow tomorrow" || response.message == "Response cannot be empty"))
+        {
+            createErrorDiv(response.message, chatWindow);
+
+
+            // Disable the input
+            if(response.message == "Today's mood has been analysed! Come back tomorrow tomorrow")
+            {
+                messageInput.disabled = true;
+            }
+
+        }
+        console.log(response);
+        // User message
+        const rightMessageDiv = document.createElement("div");
+        rightMessageDiv.className = "message right";
+        rightMessageDiv.style.backgroundColor = "#dcf8c6";
+        rightMessageDiv.style.alignSelf = "flex-end";
+        rightMessageDiv.style.marginLeft = "auto";
+        rightMessageDiv.style.textAlign = "left";
+        rightMessageDiv.style.marginTop = "1.5rem";
+        rightMessageDiv.style.marginBottom = "1.5rem";
+
+
+        const userMessage = document.createElement("p");
+        userMessage.id = "message";
+        userMessage.textContent = response.data.userResponse;
+
+        const userImage = document.createElement("img");
+        userImage.id = "right-img";
+        userImage.src = profPics;
+
+        const timestampRight = document.createElement("span");
+        timestampRight.id = "timespan-right";
+        timestampRight.className = "timespan";
+        timestampRight.textContent = response.data.timestamp;
+
+        rightMessageDiv.appendChild(userMessage);
+        rightMessageDiv.appendChild(userImage);
+        rightMessageDiv.appendChild(timestampRight);
+
+        messageInput.value = "";
+
+
+        //Ai response
+
+        const question = await getMoodQuestion(token);
+        if(question.ok)
+        {
+            const questionData = question.data;
+            console.log(questionData);
+
+            const leftMessageDiv = document.createElement("div");
+            leftMessageDiv.className = "message left";
+            leftMessageDiv.style.backgroundColor = "#fff";
+            leftMessageDiv.style.alignSelf = "flex-start";
+            leftMessageDiv.style.marginRight = "auto";
+            leftMessageDiv.style.textAlign = "left";
+            leftMessageDiv.style.marginBottom = "1.5rem";
+
+            const aiResponse = document.createElement("p");
+            aiResponse.id = "message";
+            aiResponse.textContent = questionData.question;
+
+            const aiProfilePic = document.createElement("img");
+            aiProfilePic.id = "left-img";
+            aiProfilePic.src = "./images/AiComp.png";
+
+            const aiTimestampLeft = document.createElement("span");
+            aiTimestampLeft.id = "timespan-right";
+            timestampRight.className = "timespan-right";
+            aiTimestampLeft.textContent = questionData.timestamp;
+
+            leftMessageDiv.appendChild(aiResponse);
+            leftMessageDiv.appendChild(aiProfilePic);
+            leftMessageDiv.appendChild(aiTimestampLeft);
+
+            chatWindow.appendChild(rightMessageDiv);
+            chatWindow.appendChild(aiResponse);
+        }
+
+
+        // AI question
+        // const question = await getMoodQuestion(token);
+
+        // if(question.ok)
+        // {
+        //     const questionData = question.data;
+        //     console.log(question);
+
+        //     const questionDiv = document.createElement("div");
+        //     questionDiv.className = "message left";
+        //     questionDiv.style.backgroundColor = "#fff";
+        //     questionDiv.style.alignSelf = "flex-start";
+        //     questionDiv.style.marginRight = "auto";
+        //     questionDiv.style.textAlign = "left";
+        //     questionDiv.style.marginBottom = "1.5rem";
+
+
+        //     const aiMessage = document.createElement("p");
+        //     aiMessage.id = "message";
+        //     aiMessage.textContent = questionData;
+
+        //     const aiImage = document.createElement("img");
+        //     aiImage.id = "left-img";
+        //     aiImage.src = "./images/AiComp.png";
+
+        //     const timestampLeft = document.createElement("span");
+        //     timestampLeft.id = "timespan-left";
+        //     timestampLeft.textContent = formatDate(new Date());
+
+        //     chatWindow.appendChild(questionDiv);
+
+        // }
+    }
+    
+}
+
+async function AnalyseUsersMood(token)
+{
+    const data = fetch("https://localhost:7173/api/chat/analysemood", {
+        method: "Get",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+        },
+    });
+
+    if(data.ok)
+    {
+        const resp = await data.json();
+        console.log(resp)
+        return resp;
+    }
+    console.log("error")
+}
+
+function createErrorDiv(errorMessageParam, chatWindow)
+{
+    let existingErrorMessage = document.querySelector("#error-message");
+    if (existingErrorMessage && chatWindow.contains(existingErrorMessage)) {
+        chatWindow.removeChild(existingErrorMessage); // Remove the existing error message
+    }
+    // Create a new error message element
+    const errorMessage = document.createElement("p");
+    errorMessage.id = "error-message";
+    errorMessage.textContent = errorMessageParam;
+    errorMessage.style.color = "red";
+    errorMessage.style.textAlign = "center";
+
+    if (chatWindow.children.length > 0) {
+        // Insert as the last child
+        chatWindow.appendChild(errorMessage);
     }
 }
 
@@ -263,83 +508,4 @@ async function getMoodQuestion(token) {
     } else {
         console.error("Failed to fetch mood question.");
     }
-}
-
-// Helper to get the current date in yyyy-MM-dd format
-function dateTime() {
-    const newDate = new Date();
-    return newDate.toISOString().split("T")[0];
-}
-
-
-function formatDate(date)
-{
-    const newDate = new Date(date);
-    const time = newDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    return time;
-    
-}
-
-async function respondToMoodAnalysisQuestion(response, token)
-{
-    const data = fetch("https://localhost:7173/api/chat/userresponse", {
-        method: "Post",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify(response.value) 
-    });
-
-    if(data.ok) 
-    {
-        const resp = await data.json();
-        console.log(resp)
-        return resp;
-    }
-    console.log("error")
-}
-
-async function handleSend(messageInput, token) {
-    const response = await respondToMoodAnalysisQuestion(messageInput, token);
-    if (response.status == "Unsuccessful" && response.message == "Today's mood has been analysed! Come back tomorrow tomorrow") {
-        messageInput.disabled = true;
-    }
-    console.log(response);
-    messageInput.value = "";
-
-    // User message
-    const messageDiv = document.createElement("div");
-    messageDiv.className = "message right";
-    messageDiv.style.backgroundColor = "#dcf8c6";
-    messageDiv.style.alignSelf = "flex-end";
-    messageDiv.style.marginLeft = "auto";
-    messageDiv.style.textAlign = "left";
-    messageDiv.style.marginTop = "1.5rem";
-    messageDiv.style.marginBottom = "1.5rem";
-
-    const message = `<p id="message">${response.data.userResponse}</p>
-        <img id="right-img" src=${profPics} alt="" />
-        <span class="timestamp" id="timespan-right">${response.data.timespan}</span>`;
-    messageDiv.innerHTML = message;
-    chatWindow.appendChild(messageDiv);
-
-    // AI question
-    const question = getMoodQuestion(token);
-    const questionData = question.data;
-    console.log(question);
-
-    const questionDiv = document.createElement("div");
-    questionDiv.className = "message left";
-    questionDiv.style.backgroundColor = "#fff";
-    questionDiv.style.alignSelf = "flex-start";
-    questionDiv.style.marginRight = "auto";
-    questionDiv.style.textAlign = "left";
-    questionDiv.style.marginBottom = "1.5rem";
-
-    const questionMessage = `<p id="message-left">${questionData.question}</p>
-        <img id="left-img" src="./images/AiComp.png" alt="" />
-        <span class="timestamp" id="timespan-left">${formatDate(questionData.timestamp)}</span>`;
-    questionDiv.innerHTML = questionMessage;
-    chatWindow.appendChild(questionDiv);
 }
