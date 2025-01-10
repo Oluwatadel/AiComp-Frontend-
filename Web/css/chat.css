@@ -84,7 +84,7 @@ body {
   height: 28vh;
 }
 .mainmessage {
-  max-width: 80%;
+  max-width: 90%;
   margin-bottom: 10px;
   position: relative;
   clear: both;
@@ -96,6 +96,9 @@ body {
   margin-left: auto;
   text-align: left;
   margin-top: 1.8rem;
+  margin-bottom: 1.8rem;
+
+  
 }
 
 .mainmessage.right p {
@@ -149,7 +152,12 @@ body {
   color: #999;
   position: absolute;
   bottom: -18px;
-  right: 10px;
+  right: 48px;
+}
+
+.mainmessage.left span.timestamp
+{
+  left: 52px;
 }
 
 /* Chat Input */

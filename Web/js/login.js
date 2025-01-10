@@ -39,7 +39,7 @@
         if(loginForm)
             {
                 loginForm.addEventListener("submit", async (e) => {
-                    e.preventDefault();
+                    // e.preventDefault();
 
                     const loginObj = {
                         email: loginUserName.value,

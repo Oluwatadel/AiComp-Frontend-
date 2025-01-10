@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const mood = document.querySelector("#mood");
     const logout = document.querySelector("#logout");
     const mainContent = document.querySelector("#main-content");
     const dashboardLink = document.querySelector(".sidebar a.active");
@@ -10,12 +9,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const messageInput = document.querySelector("#message-input");
     const send = document.querySelector("#send-btn");
 
-
-
-
     try {
         // Set current date
-        date.value = dateTime();
+        if(date)
+            date.value = dateTime();
 
         // Retrieve token
         const token = await getToken();
@@ -23,23 +20,26 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Fetch user profile details
         const profileDetails = await getProfile(token);
-        if (profileDetails && profileDetails.data) {
-            name.textContent = profileDetails.data.firstName;
-        }
+        if(name)
+            if (profileDetails && profileDetails.data) {
+                name.textContent = profileDetails.data.firstName;
+            }
 
         // Fetch user profile picture
         const profPics = await getProfilePic(token);
-        if (profPics) {
+        if (profPics && profilePics) {
             profilePics.src = profPics;
         }
 
-        messageInput.setAttribute("autocomplete", "off"); //Suggestion of previous input not needed
-
         // Fetch daily mood messages
-        await fetchMoodMessages(token, profPics, chatWindow);
-
+        await fetchMoodMessages(token, profPics, chatWindow, messageInput);
+        messageInput.setAttribute("autocomplete", "off"); //Suggestion of previous input not needed
+        if(messageInput.value === "")
+            send.disabled = true;
         if(messageInput && send)
         {
+            send.disabled = false;
+
             send.addEventListener("click", () => {
                 handleSend(chatWindow, messageInput, token, profPics);
             });
@@ -51,11 +51,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
         }
-        else {
-            console.error("messageInput or send element not found.");
-        }
-
-
     } catch (error) {
         console.error("Error during page initialization:", error);
     }
@@ -79,7 +74,7 @@ async function getProfile(token) {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            "Authorization": `Bearer ${token}`,
         },
     });
     if (resp.ok) {
@@ -110,7 +105,7 @@ async function getProfilePic(token) {
 }
 
 // Fetch mood messages
-async function fetchMoodMessages(token, profilePics, chatWindow) {
+async function fetchMoodMessages(token, profilePics, chatWindow, messageInput) {
     const moodMessagesForTodayUrl = "https://localhost:7173/api/message/moodmessages";
 
     const todaysMood = await fetch(moodMessagesForTodayUrl, {
@@ -126,18 +121,21 @@ async function fetchMoodMessages(token, profilePics, chatWindow) {
         console.log(data);
 
         // Clear the chat window
-        chatWindow.innerHTML = "";
-
-        chatWindow.style.flex = "1";
-        chatWindow.style.padding = "20px";
-        chatWindow.style.overflowY = "auto";
-        chatWindow.style.backgroundColor = "#e5ddd5";
-        chatWindow.style.borderTopLeftRadius = "var(--card-border-radius)";
-        chatWindow.style.borderTopRightRadius = "var(--card-border-radius)";
-        chatWindow.style.height = "28vh";
+        if(chatWindow)
+        {
+            chatWindow.innerHTML = "";
+            chatWindow.style.flex = "1";
+            chatWindow.style.padding = "20px";
+            chatWindow.style.overflowY = "auto";
+            chatWindow.style.backgroundColor = "#e5ddd5";
+            chatWindow.style.borderTopLeftRadius = "var(--card-border-radius)";
+            chatWindow.style.borderTopRightRadius = "var(--card-border-radius)";
+            chatWindow.style.height = "28vh";
+        }
+        
 
         // Check if data exists
-        if (Array.isArray(data.data) && data.data.length > 0 )
+        if (Array.isArray(data.data) && data.data.length > 0 && data.data.length <= 8)
         {
             data.data.forEach((inf) => {
             if(inf.role == 1)
@@ -156,9 +154,10 @@ async function fetchMoodMessages(token, profilePics, chatWindow) {
                 <span class="timestamp" id="timespan-right">${formatDate(inf.date)}</span>`;
 
                 messageDiv.innerHTML = message;
-                chatWindow.appendChild(messageDiv);
+                if(chatWindow)
+                    chatWindow.appendChild(messageDiv);
             }
-            else if(inf.role == 0)
+            else if(inf.role == 0 )
             {
                 const messageDiv = document.createElement("div");
                 messageDiv.className = "message left";
@@ -175,42 +174,30 @@ async function fetchMoodMessages(token, profilePics, chatWindow) {
 
                 // messageTag.style.color = "black";
 
-
-                chatWindow.appendChild(messageDiv);
+                if(chatWindow)
+                    chatWindow.appendChild(messageDiv);
             }
             });
-            const question = await getMoodQuestion(token);
-            if(question.status == "Error" || question.status == "Unsuccessful")
+            
+            const lastItem = data.data[data.data.length - 1]
+            if((data.data.length > 0 || data.data.length < 8) && lastItem.role == 1)
             {
-                const questionErrorMessage = question.message;
-                const errorMessage = document.createElement("p");
-                errorMessage.id="error-message";
-                errorMessage.textContent = `${questionErrorMessage}`;
-                chatWindow.appendChild(errorMessage);
-                errorMessage.style.color = "red";
-                errorMessage.style.textAlign = "center";
-
-            }
-            if(question && question.data && question.data.question)
-            {
-                const questionData = question.data;
-                const messageDiv = document.createElement("div");
-                messageDiv.className = "message left";
-                messageDiv.style.backgroundColor = "#fff";
-                messageDiv.style.alignSelf = "flex-start";
-                messageDiv.style.marginRight = "auto";
-                messageDiv.style.textAlign = "left";
-                messageDiv.style.marginBottom = "1.5rem";
-                messageDiv.innerHTML = `<p id="message-left">${questionData.question}</p>
-                <img id="left-img" src="./images/AiComp.png" alt="" />
-                <span class="timestamp" id="timespan-left">${formatDate(questionData.timestamp)}</span>`;
-            }
-
-            if(data.data.length == 8)
-            {
-                const returnedResult = AnalyseUsersMood(token);
-                if(returnedResult)
+                const question = await getMoodQuestion(token);
+                if(question.status == "Error" || question.status == "Unsuccessful")
                 {
+                    const questionErrorMessage = question.message;
+                    const errorMessage = document.createElement("p");
+                    errorMessage.id="error-message";
+                    errorMessage.textContent = `${questionErrorMessage}`;
+                    if(chatWindow)
+                        chatWindow.appendChild(errorMessage);
+                    errorMessage.style.color = "red";
+                    errorMessage.style.textAlign = "center";
+
+                }
+                if(question && question.data && question.data.question)
+                {
+                    const questionData = question.data;
                     const messageDiv = document.createElement("div");
                     messageDiv.className = "message left";
                     messageDiv.style.backgroundColor = "#fff";
@@ -218,7 +205,30 @@ async function fetchMoodMessages(token, profilePics, chatWindow) {
                     messageDiv.style.marginRight = "auto";
                     messageDiv.style.textAlign = "left";
                     messageDiv.style.marginBottom = "1.5rem";
-                    messageDiv.innerHTML = `<p id="message-left">${returnedResult.question}</p>
+                    messageDiv.innerHTML = `<p id="message-left">${questionData.question}</p>
+                    <img id="left-img" src="./images/AiComp.png" alt="" />
+                    <span class="timestamp" id="timespan-left">${formatDate(questionData.timestamp)}</span>`;
+                }
+            }
+            
+//===============================================
+            if(data.data.length === 8)
+            {
+                messageInput.disabled = true;
+                const returnedResult = await AnalyseUsersMood(token);
+                console.log(returnedResult)
+                
+                if(returnedResult && (returnedResult.status || returnedResult.data))
+                {
+                    const dataReturned = returnedResult.data
+                    const messageDiv = document.createElement("div");
+                    messageDiv.className = "message left";
+                    messageDiv.style.backgroundColor = "#fff";
+                    messageDiv.style.alignSelf = "flex-start";
+                    messageDiv.style.marginRight = "auto";
+                    messageDiv.style.textAlign = "left";
+                    messageDiv.style.marginBottom = "1.5rem";
+                    messageDiv.innerHTML = `<p id="message-left">${dataReturned}</p>
                         <img id="left-img" src="./images/AiComp.png" alt="" />
                         <span class="timestamp" id="timespan-left">${formatDate(new Date())}</span>`;
                     chatWindow.appendChild(messageDiv)
@@ -272,7 +282,12 @@ async function fetchMoodMessages(token, profilePics, chatWindow) {
             <span class="timestamp" id="timespan-left">${formatDate(questionData.timestamp)}</span>`;
         chatWindow.appendChild(messageDiv);
 
+        
     }
+        const scrollElementHTML = "<main></main>";
+        chatWindow.insertAdjacentHTML("beforeend", scrollElementHTML);
+        const scrollElement = chatWindow.querySelector("main");
+        scrollElement.scrollIntoView()
 }
 
 
@@ -327,127 +342,102 @@ async function respondToMoodAnalysisQuestion(response, token)
     {
         const errorData = "Input cannot be empty"
         createErrorDiv("Input cannot be empty", chatWindow);
+        
     }
     else
     {
+        const error = document.querySelector("#error-message");
+        if(error)
+        {
+            chatWindow.removeChild(error);
+        }
         const response = await respondToMoodAnalysisQuestion(messageInput.value, token);
+        
         console.log(response);
 
-        if (response && response.status == "Unsuccessful" &&
-            (response.message == "Today's mood has been analysed! Come back tomorrow tomorrow" || response.message == "Response cannot be empty"))
+        if (response && (response.status == "Unsuccessful" ||
+            (response.message == "Today's mood has been analysed! Come back tomorrow tomorrow" || response.message == "Response cannot be empty")))
         {
             createErrorDiv(response.message, chatWindow);
 
 
             // Disable the input
-            if(response.message == "Today's mood has been analysed! Come back tomorrow tomorrow")
+            if(response.message == "Today's mood has been analysed! Come back tomorrow tomorrow" || response.message == "Mood Analysis done already! Come back tomorrow")
             {
                 messageInput.disabled = true;
             }
 
         }
-        console.log(response);
-        // User message
-        const rightMessageDiv = document.createElement("div");
-        rightMessageDiv.className = "message right";
-        rightMessageDiv.style.backgroundColor = "#dcf8c6";
-        rightMessageDiv.style.alignSelf = "flex-end";
-        rightMessageDiv.style.marginLeft = "auto";
-        rightMessageDiv.style.textAlign = "left";
-        rightMessageDiv.style.marginTop = "1.5rem";
-        rightMessageDiv.style.marginBottom = "1.5rem";
-
-
-        const userMessage = document.createElement("p");
-        userMessage.id = "message";
-        userMessage.textContent = response.data.userResponse;
-
-        const userImage = document.createElement("img");
-        userImage.id = "right-img";
-        userImage.src = profPics;
-
-        const timestampRight = document.createElement("span");
-        timestampRight.id = "timespan-right";
-        timestampRight.className = "timespan";
-        timestampRight.textContent = response.data.timestamp;
-
-        rightMessageDiv.appendChild(userMessage);
-        rightMessageDiv.appendChild(userImage);
-        rightMessageDiv.appendChild(timestampRight);
-
-        messageInput.value = "";
-
-
-        //Ai response
-
-        const question = await getMoodQuestion(token);
-        if(question.ok)
+        else
         {
-            const questionData = question.data;
-            console.log(questionData);
+            console.log(response);
+//=================================================== User message============================================================================
+        const rightMessageDiv = document.createElement("div");
+            rightMessageDiv.className = "message right";
+            rightMessageDiv.style.backgroundColor = "#dcf8c6";
+            rightMessageDiv.style.alignSelf = "flex-end";
+            rightMessageDiv.style.marginLeft = "auto";
+            rightMessageDiv.style.textAlign = "left";
+            rightMessageDiv.style.marginTop = "1.5rem";
+            rightMessageDiv.style.marginBottom = "1.5rem";
 
-            const leftMessageDiv = document.createElement("div");
-            leftMessageDiv.className = "message left";
-            leftMessageDiv.style.backgroundColor = "#fff";
-            leftMessageDiv.style.alignSelf = "flex-start";
-            leftMessageDiv.style.marginRight = "auto";
-            leftMessageDiv.style.textAlign = "left";
-            leftMessageDiv.style.marginBottom = "1.5rem";
 
-            const aiResponse = document.createElement("p");
-            aiResponse.id = "message";
-            aiResponse.textContent = questionData.question;
+            const userMessage = document.createElement("p");
+            userMessage.id = "message";
+            userMessage.textContent = response.data.userResponse;
 
-            const aiProfilePic = document.createElement("img");
-            aiProfilePic.id = "left-img";
-            aiProfilePic.src = "./images/AiComp.png";
+            const userImage = document.createElement("img");
+            userImage.id = "right-img";
+            userImage.src = profPics;
 
-            const aiTimestampLeft = document.createElement("span");
-            aiTimestampLeft.id = "timespan-right";
-            timestampRight.className = "timespan-right";
-            aiTimestampLeft.textContent = questionData.timestamp;
+            const timestampRight = document.createElement("span");
+            timestampRight.className = "timestamp";
+            timestampRight.id = "timespan-right";
+            timestampRight.textContent = formatDate(response.data.timestamp);
 
-            leftMessageDiv.appendChild(aiResponse);
-            leftMessageDiv.appendChild(aiProfilePic);
-            leftMessageDiv.appendChild(aiTimestampLeft);
+            rightMessageDiv.appendChild(userMessage);
+            rightMessageDiv.appendChild(userImage);
+            rightMessageDiv.appendChild(timestampRight);
 
             chatWindow.appendChild(rightMessageDiv);
-            chatWindow.appendChild(aiResponse);
+
+            messageInput.value = "";
+
+
+//===========================================================Ai response======================================================================
+            const question = await getMoodQuestion(token);
+            if(question.data && question.status != "Unsuccessful")
+            {
+                const questionData = question.data;
+
+                const leftMessageDiv = document.createElement("div");
+                leftMessageDiv.className = "message left";
+                leftMessageDiv.style.backgroundColor = "#fff";
+                leftMessageDiv.style.alignSelf = "flex-start";
+                leftMessageDiv.style.marginRight = "auto";
+                leftMessageDiv.style.textAlign = "left";
+                leftMessageDiv.style.marginBottom = "1.5rem";
+
+                const aiResponse = document.createElement("p");
+                aiResponse.id = "message-left";
+                aiResponse.textContent = questionData.question;
+
+                const aiProfilePic = document.createElement("img");
+                aiProfilePic.id = "left-img";
+                aiProfilePic.src = "./images/AiComp.png";
+
+                const aiTimestampLeft = document.createElement("span");
+                aiTimestampLeft.className = "timestamp";
+                aiTimestampLeft.id = "timespan-right";
+                aiTimestampLeft.textContent = formatDate(questionData.timestamp);
+
+                leftMessageDiv.appendChild(aiResponse);
+                leftMessageDiv.appendChild(aiProfilePic);
+                leftMessageDiv.appendChild(aiTimestampLeft);
+
+                chatWindow.appendChild(leftMessageDiv);
+            }
         }
-
-
-        // AI question
-        // const question = await getMoodQuestion(token);
-
-        // if(question.ok)
-        // {
-        //     const questionData = question.data;
-        //     console.log(question);
-
-        //     const questionDiv = document.createElement("div");
-        //     questionDiv.className = "message left";
-        //     questionDiv.style.backgroundColor = "#fff";
-        //     questionDiv.style.alignSelf = "flex-start";
-        //     questionDiv.style.marginRight = "auto";
-        //     questionDiv.style.textAlign = "left";
-        //     questionDiv.style.marginBottom = "1.5rem";
-
-
-        //     const aiMessage = document.createElement("p");
-        //     aiMessage.id = "message";
-        //     aiMessage.textContent = questionData;
-
-        //     const aiImage = document.createElement("img");
-        //     aiImage.id = "left-img";
-        //     aiImage.src = "./images/AiComp.png";
-
-        //     const timestampLeft = document.createElement("span");
-        //     timestampLeft.id = "timespan-left";
-        //     timestampLeft.textContent = formatDate(new Date());
-
-        //     chatWindow.appendChild(questionDiv);
-
-        // }
     }
     
 }
@@ -468,7 +458,6 @@ async function AnalyseUsersMood(token)
         console.log(resp)
         return resp;
     }
-    console.log("error")
 }
 
 function createErrorDiv(errorMessageParam, chatWindow)

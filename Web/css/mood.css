@@ -1,0 +1,39 @@
+canvas {
+    all: unset; /* Unset all inherited or applied styles */
+    display: block; /* Prevent it from being treated as inline */
+    width: auto; /* Reset any inherited width */
+    height: auto; /* Reset any inherited height */
+    border: none; /* Remove border if applied */
+    background: none; /* Remove background if applied */
+  }
+
+.weekly-chart,
+.monthly-chart{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.chart-Div {
+    width: 48%;
+    height:250px;
+}
+
+h3{
+    padding-top: 15px;
+    font-size: larger;
+}
+
+
+
+canvas#emotion-Chart,
+canvas#intensitychart,
+canvas#monthlyEmotionPieGraph,
+canvas#monthlyEmotionLineGraph{
+    background: var(--color-white);
+    padding: 10px;
+    border-radius: var(--card-border-radius);
+    margin-top: 1rem;
+    box-shadow: var(--box-shadow);
+    transition: all 300ms ease;
+}

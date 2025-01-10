@@ -37,7 +37,6 @@ document.addEventListener("DOMContentLoaded", (e) => {
         else
         {
             errorMessage.textContent = "";
-
         }
     })
     
