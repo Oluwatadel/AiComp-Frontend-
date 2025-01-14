@@ -1,3 +1,5 @@
+import { getToken, dateTime } from "./dashboard.js";
+
 const moodTemplate = "./templates/mood.html";
 const mood = document.querySelector("#mood");
 
@@ -202,7 +204,7 @@ async function loadMoodTemplate(moodTemplate)
 }
 
 
-async function getAllMoodLogs(token)
+export async function getAllMoodLogs(token)
 {
     const response = await fetch("https://localhost:7173/api/moods/all", {
     method: "Get",
@@ -223,7 +225,7 @@ async function getAllMoodLogs(token)
     return data;
 }
 //================================================================Weekly==========================================================
-async function getWeeklyMoodLogs(token)
+export async function getWeeklyMoodLogs(token)
 {
     const response = await fetch("https://localhost:7173/api/moods/weekly", {
     method: "Get",
@@ -244,7 +246,7 @@ async function getWeeklyMoodLogs(token)
 }
 
 //================================================================Monthly==========================================================
-async function getMonthlyMoodLogs(token)
+export async function getMonthlyMoodLogs(token)
 {
     const response = await fetch("https://localhost:7173/api/moods/weekly", {
     method: "Get",
@@ -265,7 +267,7 @@ async function getMonthlyMoodLogs(token)
 }
 
 
-async function formatDateToShort(date) {
+export async function formatDateToShort(date) {
   const newDate = new Date(date);
   // Format to show abbreviated month and numeric day
   return newDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
@@ -274,7 +276,7 @@ async function formatDateToShort(date) {
 
 async function mappEmotiontoAValue(emotionalData) {
     const emotionCategories = {
-        positive: ['joy', 'love', 'happiness', 'happy', 'gratitude', 'pride', 'relief', 'calm'],
+        positive: ['joy', 'love', 'happiness', 'happy', 'gratitude', 'pride', 'relief', 'calm', 'relaxed'],
         negative: ['sadness', 'sad', 'stressed', 'fear', 'anger', 'angry', 'disgust', 'shame', 'jealousy', 'stress', 'anxious', 'anxiety'],
         neutral: ['neutrality', 'neutral', 'confusion', 'acceptance', 'boredom', 'equanimity'],
         mixed: ['bittersweet', 'nostalgia', 'ambivalence', 'empathy', 'suspense'],

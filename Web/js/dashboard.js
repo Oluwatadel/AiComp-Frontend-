@@ -1,3 +1,5 @@
+import { getWeeklyMoodLogs, formatDateToShort } from './mood.js';
+
 document.addEventListener("DOMContentLoaded", async () => {
     const logout = document.querySelector("#logout");
     const mainContent = document.querySelector("#main-content");
@@ -8,6 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const chatWindow = document.querySelector("#chat-window");
     const messageInput = document.querySelector("#message-input");
     const send = document.querySelector("#send-btn");
+    const dateofLastMoodLog = document.querySelector(".last-log");
 
     try {
         // Set current date
@@ -16,8 +19,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Retrieve token
         const token = await getToken();
-        console.log("Token:", token);
-
+        const moodLogs = await getWeeklyMoodLogs(token);
+        if (moodLogs?.data && Array.isArray(moodLogs.data) && moodLogs.data.length > 0) {
+            // Access the last mood log
+            const lastMood = moodLogs.data[moodLogs.data.length - 1];
+            console.log(formatDateToShort(lastMood.timestamp))
+            dateofLastMoodLog.textContent = await  formatDateToShort(lastMood.timestamp);
+        } else {
+            console.log('No mood logs found.');
+        }
         // Fetch user profile details
         const profileDetails = await getProfile(token);
         if(name)
@@ -50,6 +60,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                     handleSend(chatWindow, messageInput, token, profPics);
                 }
             });
+
+            const scrollElementHTML = "<main></main>";
+            chatWindow.insertAdjacentHTML("beforeend", scrollElementHTML);
+            const scrollElement = chatWindow.querySelector("main");
+            scrollElement.scrollIntoView();
+
         }
     } catch (error) {
         console.error("Error during page initialization:", error);
@@ -59,7 +75,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 //================================================== Helper Functions ============================================
 
 // Get token from local storage
-async function getToken() {
+export async function getToken() {
     const token = localStorage.getItem("jwt");
     if (!token) {
         console.error("No token found in local storage.");
@@ -112,7 +128,7 @@ async function fetchMoodMessages(token, profilePics, chatWindow, messageInput) {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            "Authorization": `Bearer ${token}`,
         },
     });
 
@@ -135,7 +151,7 @@ async function fetchMoodMessages(token, profilePics, chatWindow, messageInput) {
         
 
         // Check if data exists
-        if (Array.isArray(data.data) && data.data.length > 0 && data.data.length <= 8)
+        if (Array.isArray(data.data) && data.data.length > 0)
         {
             data.data.forEach((inf) => {
             if(inf.role == 1)
@@ -293,7 +309,7 @@ async function fetchMoodMessages(token, profilePics, chatWindow, messageInput) {
 
 
 // Helper to get the current date in yyyy-MM-dd format
-function dateTime() {
+export function dateTime() {
     const newDate = new Date();
     return newDate.toISOString().split("T")[0];
 }
@@ -372,7 +388,7 @@ async function respondToMoodAnalysisQuestion(response, token)
         {
             console.log(response);
 //=================================================== User message============================================================================
-        const rightMessageDiv = document.createElement("div");
+            const rightMessageDiv = document.createElement("div");
             rightMessageDiv.className = "message right";
             rightMessageDiv.style.backgroundColor = "#dcf8c6";
             rightMessageDiv.style.alignSelf = "flex-end";

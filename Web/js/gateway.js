@@ -12,11 +12,6 @@ let response = async (loginDetails) => {
     return resp;
 }
 
-
-// let completeUrl =    () => {
-//     return `${baseUrl}`
-// }
-
 let emailCheck = async (email) =>{
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

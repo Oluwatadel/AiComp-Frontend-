@@ -39,8 +39,7 @@
         if(loginForm)
             {
                 loginForm.addEventListener("submit", async (e) => {
-                    // e.preventDefault();
-
+                    e.preventDefault();
                     const loginObj = {
                         email: loginUserName.value,
                         password: loginPassword.value
@@ -66,6 +65,7 @@
                             location.href ='/Web/dashboard.html';
                             
                         }
+
                     }
                     else if(shareData.statusCode === 401)
                     {
