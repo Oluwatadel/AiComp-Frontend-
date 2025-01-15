@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", async () => {
     const profileImageInput = document.querySelector("#profilePicInput");
     const profileImage = document.querySelector("#profileImage");

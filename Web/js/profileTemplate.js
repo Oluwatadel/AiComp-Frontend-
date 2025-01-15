@@ -1,3 +1,5 @@
+import { getToken,dateTime, getProfile,getProfilePic } from "./dashboard.js";
+
 const profileClick = document.querySelector("#profile-display");
 
 //===========================================Profile================================================

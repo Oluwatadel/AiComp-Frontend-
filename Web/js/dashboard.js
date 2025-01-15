@@ -85,7 +85,7 @@ export async function getToken() {
 //==================================================================================================================
 
 // Fetch profile details
-async function getProfile(token) {
+export async function getProfile(token) {
     const resp = await fetch("https://localhost:7173/api/p/p", {
         method: "GET",
         headers: {
@@ -101,7 +101,7 @@ async function getProfile(token) {
 }
 
 // Fetch profile picture
-async function getProfilePic(token) {
+export async function getProfilePic(token) {
     const resp = await fetch("https://localhost:7173/api/p/profilephoto", {
         method: "GET",
         headers: {

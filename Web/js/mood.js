@@ -1,4 +1,5 @@
 import { getToken, dateTime } from "./dashboard.js";
+import { createChart } from './chartUtils.js'
 
 const moodTemplate = "./templates/mood.html";
 const mood = document.querySelector("#mood");
@@ -25,59 +26,21 @@ mood.addEventListener("click", async() => {
       }
     }
     const weeklychart = document.querySelector(".weekly-chart");
-    const EmotionlineGraph = document.getElementById('emotion-Chart');
-    new Chart(EmotionlineGraph, {
-        type: 'line',
-        data: {
-          labels: date,
-          datasets: [{
-            label: 'Emotion',
-            data: emotionalData,
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-    }); 
-
+    const LineChart = document.querySelector("#emotion-Chart");
+    const chartLabel = 'Emotion';
+    const EmotionlineGraph = createChart(LineChart, "emotionalChart",'line',date, emotionalData,chartLabel)    
 
     EmotionlineGraph.style.height = "260px";
+    
 
     //=================================weekly intensity barchart=========================================================
 
     const EmotionBarchart = document.createElement("div");
     EmotionBarchart.className = "chart-Div";
     EmotionBarchart.id = "chart2";
-    const weeklyIntensityBarchart = document.createElement('canvas');
-    weeklyIntensityBarchart.id = `intensitychart`;
-    
-
-    new Chart(weeklyIntensityBarchart, {
-        type: 'bar',
-        data: {
-          labels: date,
-          datasets: [{
-            label: 'intensity',
-            data: intensityData,
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-    }); 
-    
-
-
+    const weeklyIntensityCanvas = document.createElement('canvas');
+    const weeklyIntensityBarchart = createChart(weeklyIntensityCanvas, "emotionalChart",'bar',date, intensityData,"intensity")
+    weeklyIntensityBarchart.id = "intensitychart";
     EmotionBarchart.appendChild(weeklyIntensityBarchart);
     weeklychart.appendChild(EmotionBarchart);
 
@@ -114,28 +77,11 @@ mood.addEventListener("click", async() => {
 
     monthlyLineGraphy.className = "chart-Div2";
     monthlyLineGraphy.id = "chart3";
-    const monthlyEmotionLineGraph = document.createElement('canvas');
+    const monthlyLineChart = document.createElement('canvas');
+    const monthlyEmotionLineGraph = createChart(monthlyLineChart, "monthlyEmotionLineGraph",'line',dateofData, emotionalDataForTheMonth,"Occurence of Emotion");
     monthlyEmotionLineGraph.id = "monthlyEmotionLineGraph";
     
 
-    new Chart(monthlyEmotionLineGraph, {
-        type: 'line',
-        data: {
-          labels: dateofData,
-          datasets: [{
-            label: 'Monthly Emotion',
-            data: emotionalDataForTheMonth,
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-    }); 
 
     monthlyLineGraphy.appendChild(monthlyEmotionLineGraph);
 
@@ -146,28 +92,10 @@ mood.addEventListener("click", async() => {
 const monthlyPieChart = document.createElement("div");
 monthlyPieChart.className = "chart-Div2";
 monthlyPieChart.id = "piechart";
-const monthlyEmotionPieGraph = document.createElement('canvas');
+const monthlyEmotionPieChart = document.createElement('canvas');
+const monthlyEmotionPieGraph = createChart(monthlyEmotionPieChart, "monthlyEmotionPieGraph",'doughnut',dateofData, emotionalDataForTheMonth,"Emotion");
 monthlyEmotionPieGraph.id = "monthlyEmotionPieGraph";
 
-
-new Chart(monthlyEmotionPieGraph, {
-    type: 'doughnut',
-    data: {
-      labels: Object.keys(listOfEmotionExperienceInAMonth), // this line automatically turn the property into an array without the value
-      datasets: [{
-        label: 'Monthly Emotion',
-        data: Object.values(listOfEmotionExperienceInAMonth),
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-}); 
 
 monthlyPieChart.appendChild(monthlyEmotionPieGraph);
 
@@ -177,9 +105,6 @@ monthlyEmotionPieGraph.style.height = '250px';
 
 secondChartDiv.appendChild(monthlyLineGraphy);
 secondChartDiv.appendChild(monthlyPieChart);
-
-
-
 
 })
 
