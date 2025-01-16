@@ -71,7 +71,10 @@ mood.addEventListener("click", async() => {
               listOfEmotionExperienceInAMonth[log.emotion] += 1;
           }
           dateofData[i] = await formatDateToShort(log.timestamp);
-      }
+        }
+        var properties = Object.keys(listOfEmotionExperienceInAMonth);
+        var values = Object.values(listOfEmotionExperienceInAMonth);
+
     }
 
 
@@ -93,7 +96,7 @@ const monthlyPieChart = document.createElement("div");
 monthlyPieChart.className = "chart-Div2";
 monthlyPieChart.id = "piechart";
 const monthlyEmotionPieChart = document.createElement('canvas');
-const monthlyEmotionPieGraph = createChart(monthlyEmotionPieChart, "monthlyEmotionPieGraph",'doughnut',dateofData, emotionalDataForTheMonth,"Emotion");
+const monthlyEmotionPieGraph = createChart(monthlyEmotionPieChart, "monthlyEmotionPieGraph",'doughnut',properties, values,"Emotion");
 monthlyEmotionPieGraph.id = "monthlyEmotionPieGraph";
 
 
@@ -199,7 +202,7 @@ export async function formatDateToShort(date) {
 }
   
 
-async function mappEmotiontoAValue(emotionalData) {
+export async function mappEmotiontoAValue(emotionalData) {
     const emotionCategories = {
         positive: ['joy', 'love', 'happiness', 'happy', 'gratitude', 'pride', 'relief', 'calm', 'relaxed'],
         negative: ['sadness', 'sad', 'stressed', 'fear', 'anger', 'angry', 'disgust', 'shame', 'jealousy', 'stress', 'anxious', 'anxiety'],

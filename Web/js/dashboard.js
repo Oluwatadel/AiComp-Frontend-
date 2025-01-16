@@ -1,8 +1,8 @@
-import { getWeeklyMoodLogs, formatDateToShort } from './mood.js';
+import { getWeeklyMoodLogs, formatDateToShort, mappEmotiontoAValue } from './mood.js';
+import { createChart } from './chartUtils.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
     const logout = document.querySelector("#logout");
-    const mainContent = document.querySelector("#main-content");
     const dashboardLink = document.querySelector(".sidebar a.active");
     const name = document.querySelector("#name");
     const profilePics = document.querySelector(".profile-photo img");
@@ -40,6 +40,81 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (profPics && profilePics) {
             profilePics.src = profPics;
         }
+
+        //=====================================================graphs===============================================
+        const insight = document.querySelector(".insights");
+        insight.innerHTML = "";
+
+            const moodlogs = await getWeeklyMoodLogs(token);
+            const emotionalData = [];
+            const intensityData = [];
+            const dateOfEmotion = [];
+            const listOfEmotionExperienceForTheWeek = {};
+            let properties = Object.keys(listOfEmotionExperienceForTheWeek);
+            let values = Object.values(listOfEmotionExperienceForTheWeek);
+        
+            if(moodlogs.data && Array.isArray(moodlogs.data))
+            {
+                const data = moodlogs.data;
+                for (let i = 0; i < data.length; i++) {
+                  const log = data[i];
+                  const inf = await mappEmotiontoAValue(log.emotion);
+                  console.log(inf);
+                  emotionalData[i] = inf;
+                  intensityData[i] = log.intensity;
+                  if(!listOfEmotionExperienceForTheWeek[log.emotion])
+                  {
+                    listOfEmotionExperienceForTheWeek[log.emotion] = 1
+                  }
+                  else
+                  {
+                        listOfEmotionExperienceForTheWeek[log.emotion] += 1;
+                  }
+                  dateOfEmotion[i] = await formatDateToShort(log.timestamp);
+                  properties = Object.keys(listOfEmotionExperienceForTheWeek);
+                  values = Object.values(listOfEmotionExperienceForTheWeek);
+              }
+            }
+
+        const weeklychart = document.createElement("div");
+        weeklychart.className = "logs";
+        const LineChart = document.createElement("canvas");
+        const chartLabel = 'Emotion';
+        const EmotionlineGraph = createChart(LineChart, "emotionalChart",'line',dateOfEmotion, emotionalData,chartLabel);
+        const textSpan = document.createElement("span");
+        textSpan.className = "text-muted"
+        textSpan.textContent = "Weekly emotion"
+
+        LineChart.style.width = "445px"
+        textSpan.style.borderRadius = 0;
+        textSpan.style.fontSize = "1rem";
+        textSpan.style.display = "block";
+        textSpan.style.textAlign = "center";
+        textSpan.style.background = "none";
+        textSpan.style.color = "#03115a";
+
+        weeklychart.appendChild(EmotionlineGraph);
+        weeklychart.appendChild(textSpan);
+
+
+        const weeklyPiechart = document.createElement("div");
+        weeklyPiechart.className = "pielog";
+        const pieChart = document.createElement("canvas");
+        const graphLabel = 'Occurence of Emotion';
+        const EmotionpieGraph = createChart(pieChart, "emotionalPieChart",'doughnut',properties, values, graphLabel);
+        const textSpan2 = document.createElement("span");
+        textSpan2.className = "text-muted"
+        textSpan2.textContent = "Weekly emotion"
+
+        EmotionpieGraph.style.width = "270px";
+        EmotionpieGraph.style.height = "250px";
+
+        weeklyPiechart.appendChild(EmotionpieGraph)
+        insight.appendChild(weeklychart);
+        insight.appendChild(weeklyPiechart);
+        
+
+
 
         // Fetch daily mood messages
         await fetchMoodMessages(token, profPics, chatWindow, messageInput);
@@ -315,7 +390,7 @@ export function dateTime() {
 }
 
 
-function formatDate(date)
+export function formatDate(date)
 {
     const newDate = new Date(date);
     const time = newDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

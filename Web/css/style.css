@@ -36,7 +36,7 @@
 
 .logo-text{
     font-size: large;
-    display: none;
+    /* display: none; */
 }
 
 .inner-nav{

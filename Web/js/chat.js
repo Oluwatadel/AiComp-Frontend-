@@ -1,7 +1,6 @@
+import { getToken, dateTime, getProfilePic, formatDate } from "./dashboard.js";
 //=================================onclick companion load chat===================================
 const chatTemplate = "./templates/chat.html";
-
-
 
 
 chat.addEventListener("click", async() => {
