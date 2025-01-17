@@ -204,11 +204,36 @@ export async function formatDateToShort(date) {
 
 export async function mappEmotiontoAValue(emotionalData) {
     const emotionCategories = {
-        positive: ['joy', 'love', 'happiness', 'happy', 'gratitude', 'pride', 'relief', 'calm', 'relaxed'],
-        negative: ['sadness', 'sad', 'stressed', 'fear', 'anger', 'angry', 'disgust', 'shame', 'jealousy', 'stress', 'anxious', 'anxiety'],
-        neutral: ['neutrality', 'neutral', 'confusion', 'acceptance', 'boredom', 'equanimity'],
-        mixed: ['bittersweet', 'nostalgia', 'ambivalence', 'empathy', 'suspense'],
-        surprise: ['surprise', 'curiosity', 'amazement', 'wonder', 'uncertainty']
+        positive: [
+            'joy', 'love', 'happiness', 'gratitude', 'pride', 'relief', 'calm', 'energy', 'relaxation',
+            'happy', 'grateful', 'proud', 'relaxed', 'energized', 'energised',
+            'enjoy', 'love', 'appreciate', 'admire', 'calm', 'relax', 'energize',
+            'enjoyed', 'loved', 'appreciated', 'admired', 'calmed', 'relaxed', 'energized'
+        ],
+        negative: [
+            'sadness', 'stress', 'fear', 'anger', 'disgust', 'shame', 'jealousy', 'anxiety',
+            'sad', 'stressed', 'angry', 'anxious',
+            'cry', 'fear', 'stress', 'resent', 'envy', 'disgust', 'worry', 'panic',
+            'cried', 'feared', 'stressed', 'resented', 'envied', 'disgusted', 'worried', 'panicked'
+        ],
+        neutral: [
+            'neutrality', 'confusion', 'acceptance', 'boredom', 'equanimity',
+            'neutral', 'confused', 'bored', 'accepting',
+            'accept', 'observe', 'wonder', 'analyze', 'wait',
+            'accepted', 'observed', 'wondered', 'analyzed', 'waited'
+        ],
+        mixed: [
+            'bittersweetness', 'nostalgia', 'ambivalence', 'empathy', 'suspense',
+            'bittersweet', 'nostalgic', 'ambivalent', 'empathetic', 'suspenseful',
+            'reminisce', 'empathize', 'hesitate', 'reflect',
+            'reminisced', 'empathized', 'hesitated', 'reflected'
+        ],
+        surprise: [
+            'surprise', 'curiosity', 'amazement', 'wonder', 'uncertainty',
+            'surprised', 'curious', 'amazed', 'uncertain',
+            'surprise', 'wonder', 'amaze', 'explore',
+            'surprised', 'wondered', 'amazed', 'explored'
+        ]
     };
 
     // Define the values to be assigned for each category

@@ -1,0 +1,138 @@
+:root {
+    --color-primary: #7380ec;
+    --color-danger: red;
+    --color-success: #41f1b6;
+    --color-warning: #ffbb55;
+    --color-white: #fff;
+    --color-info-dark: #7d8da1;
+    --color-info-light: rgba(130, 127, 127, 0.933);
+    --color-dark: #363949;
+    --color-light: #dce1eb;
+    --color-primary-variant: #677483;
+    --color-dark-variant: #677483;
+    --color-background: #f6f6f9;
+  
+    --card-border-radius: 2rem;
+    --border-radius-1: 0.4rem;
+    --border-radius-2: 0.8rem;
+    --border-radius-3: 1.2rem;
+  
+    --card-padding: 1.8rem;
+    --padding-1: 1.2rem;
+  
+    --box-shadow: 0 2rem 3rem var(--color-light);
+}
+
+
+.journal-container {
+    margin-top: 1rem;
+    background: var(--color-white);
+    background-color: var(--color-background);
+    padding: 0 var(--card-padding);
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--box-shadow);
+    transition: all 300ms ease;
+    width: 100%;
+    margin-top: 20px;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+.journal-list{
+    display: block;
+    height: 61px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 50vh;
+    max-height: 50vh;
+    background: var(--color-white);
+    background-color: var(--color-background);
+}
+
+.journal-list h2{
+    margin-top: 10px;
+    padding-left: 10px;
+}
+
+#journalEntries{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#journalEntries:hover{
+    border-left: 2px solid #7d89eb;
+    border-bottom: 2px solid #7d89eb;
+    border-bottom-left-radius: 5px;
+}
+
+#journal-content{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 94%;
+}
+
+p#content {
+    padding: 10px;
+    display: block; /* Ensures the <p> acts as a block element */
+    width: 95%; /* Forces it to take full width */
+    max-width: 100%; /* Prevents overflowing */
+    word-break: break-word; /* Breaks long words */
+    overflow-wrap: break-word; /* Wraps overflowing words */
+    white-space: normal; /* Allows text to wrap */
+    background: rgb(245, 245, 245);
+}
+
+p
+
+.add-journal {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#journalTitle{
+    margin-bottom: 5px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#addJournalBtn,
+#deleteJournalBtn {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 12px 0;
+}
+
+#addJournalBtn:hover,
+#deleteJournalBtn:hover {
+    background: #075e54;
+}
+
+.delete-btn {
+    background: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.delete-btn:hover {
+    background: darkred;
+}

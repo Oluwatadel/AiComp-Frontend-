@@ -1,5 +1,6 @@
 import { getWeeklyMoodLogs, formatDateToShort, mappEmotiontoAValue } from './mood.js';
 import { createChart } from './chartUtils.js';
+import { loadJournalTemplate,fetchJournals } from './journal.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
     const logout = document.querySelector("#logout");
@@ -11,6 +12,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const messageInput = document.querySelector("#message-input");
     const send = document.querySelector("#send-btn");
     const dateofLastMoodLog = document.querySelector(".last-log");
+    const update = document.querySelector("#updateContainer");
+    const journal = document.querySelector("#journal");
 
     try {
         // Set current date
@@ -141,7 +144,90 @@ document.addEventListener("DOMContentLoaded", async () => {
             const scrollElement = chatWindow.querySelector("main");
             scrollElement.scrollIntoView();
 
+    //==========================================================Update section=====================================================
+            update.innerHTML = "";
+            const notifications = await LoadNotifications(token);
+            
+
+            if(notifications.data && Array.isArray(notifications.data))
+            {
+                const userNotifications = notifications.data
+
+                
+                for(let i = 0; i < userNotifications.length; i++)
+                {
+                    const innerUpdateContainer = document.createElement("div");
+                    innerUpdateContainer.className = "update";
+            //=========================recent update profile pic========================= 
+                    const profilePicture = document.createElement("div");
+                    profilePicture.className = "profile-photo";
+
+                    const profileImg = document.createElement("img");
+                    profileImg.src = profPics;
+                  //=================Append the profileImg in the div profilepicture=====
+                    profilePicture.appendChild(profileImg);
+
+            //=========================recent update message========================= 
+                    const message = document.createElement("div");
+                    message.className = "message";
+
+                    const messageTag = document.createElement("p");
+                    // messageTag.className = "messageTag";
+                    messageTag.textContent = userNotifications[i].description;
+                    message.appendChild(messageTag);
+
+                    const textMuted = document.createElement("small");
+                    textMuted.className = "text-muted";
+                    textMuted.textContent = await presentTimeAgo(userNotifications[i].timestamp);
+                    message.appendChild(textMuted);
+
+                  //=============================Append all child to outer contaier==============================
+                    innerUpdateContainer.appendChild(profilePicture);
+                    innerUpdateContainer.appendChild(message);
+
+            //=========================Append inner container to the inner container========================= 
+                    update.appendChild(innerUpdateContainer);
+                }
+            }        
         }
+
+        journal.addEventListener("click", async () => {
+            await loadJournalTemplate();
+            const journalsFetched = await fetchJournals(token)
+
+            if(journalsFetched && Array.isArray(journalsFetched.data))
+            {
+                const journals = journalsFetched.data
+
+                const journalEntries = document.querySelector("#journalEntries");
+                journalEntries.innerHTML = "";
+
+                for(let i = 0; i < journals.length; i++)
+                {
+                    console.log(journals[i]);
+                    const journalContent = document.createElement("div");
+                    journalContent.id = "journal-content";
+
+                    const content = document.createElement("p");
+                    content.id = content;
+                    content.textContent = journals[i].content;
+
+                    const timestamp = document.createElement('span');
+                    timestamp.textContent = journals[i].timestamp;
+
+                    journalContent.appendChild(content);
+                    journalContent.appendChild(timestamp);
+
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.id = "deleteJournalBtn"
+
+                    journalEntries.appendChild(journalContent);
+                    journalEntries.appendChild(deleteBtn);
+                }
+                
+
+            }
+        });
     } catch (error) {
         console.error("Error during page initialization:", error);
     }
@@ -156,6 +242,44 @@ export async function getToken() {
         console.error("No token found in local storage.");
     }
     return token;
+}
+
+export async function presentTimeAgo(timestamp) {
+    const now = new Date();
+    const past = new Date(timestamp);
+    const diffInSeconds = Math.floor((now - past) / 1000); // Difference in seconds
+
+    if (diffInSeconds < 60) {
+        return `${diffInSeconds} second${diffInSeconds !== 1 ? 's' : ''} ago`;
+    }
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+        return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
+    }
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+        return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
+    }
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) {
+        return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`;
+    }
+
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    if (diffInWeeks < 4) {
+        return `${diffInWeeks} week${diffInWeeks !== 1 ? 's' : ''} ago`;
+    }
+
+    const diffInMonths = Math.floor(diffInDays / 30);
+    if (diffInMonths < 12) {
+        return `${diffInMonths} month${diffInMonths !== 1 ? 's' : ''} ago`;
+    }
+
+    const diffInYears = Math.floor(diffInDays / 365);
+    return `${diffInYears} year${diffInYears !== 1 ? 's' : ''} ago`;
 }
 //==================================================================================================================
 
@@ -589,3 +713,23 @@ async function getMoodQuestion(token) {
         console.error("Failed to fetch mood question.");
     }
 }
+
+export async function LoadNotifications(token) {
+    const url = "https://localhost:7173/api/Notification"
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    if (response.ok) {
+        const data = await response.json();
+        return data;
+    } else {
+        console.error(`${response.message}. Failed to fetch notifications.`);
+    }
+}
+
+
+
