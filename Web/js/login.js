@@ -1,3 +1,5 @@
+import { getProfile } from "./dashboard";
+
     document.addEventListener("DOMContentLoaded", (e) => {
         let loginForm = document.querySelector(".login100-form.validate-form");
         let loginPassword = document.querySelector(".input100.password");
@@ -53,17 +55,17 @@
                         console.log(response)
                         localStorage.removeItem('jwt');
                         localStorage.setItem('jwt', response.data.accessToken.result);
-                       //Check if the user has a profile
-                        if(response.profile == null){
-                            console.log("Profile is null, redirecting to profile creation.");
-                            location.href = '/Web/create-profile.html';  // Redirect to the profile creation page               
+                       //Check if the user has a e
+                       const token = response.data.accessToken.result;
+                       const userProfile = await getProfile(token);
+                        if(userProfile.ok){
+                            console.log("Profile exists, redirecting to dashboard.");
+                            location.href ='/Web/dashboard.html';          
                         } 
                         else
                         {
-                            console.log("Profile exists, redirecting to dashboard.");
-                            // console.log(`${shareData.data.accessToken.result}`);
-                            location.href ='/Web/dashboard.html';
-                            
+                            console.log("Profile is null, redirecting to profile creation.");
+                            location.href = '/Web/create-profile.html';  // Redirect to the profile creation page                             
                         }
 
                     }
@@ -71,23 +73,7 @@
                     {
                         emailError.textContent = shareData.message
                     }
-        
-                    // //Check if the user has a profile
-                    // else if(shareData.profile == null){
-                    //     console.log("Profile is null, redirecting to profile creation.");
-                    //     localStorage.removeItem('jwt');
-                    //     localStorage.setItem('jwt', shareData.data.accessToken.result);
-                    //     location.href = '/Web/create-profile.html';  // Redirect to the profile creation page                
-                    // } 
-                    // else
-                    // {
-                    //     console.log("Profile exists, redirecting to dashboard.");
-                    //     localStorage.removeItem('jwt');
-                    //     localStorage.setItem('jwt', shareData.data.accessToken.result);
-                    //     // console.log(`${shareData.data.accessToken.result}`);
-                    //     location.href ='/Web/dashboard.html';
-                        
-                    // }
+
         
                 });
                 
@@ -108,13 +94,6 @@
         const regexCheck = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return regexCheck.test(email);
     }
-
-
-
-        // var response = localStorage.getItem("response")
-
-        // console.log(JSON.parse(response))
-        // console.log("entered")
 
 
 

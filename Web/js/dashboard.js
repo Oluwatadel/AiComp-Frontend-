@@ -1,6 +1,6 @@
 import { getWeeklyMoodLogs, formatDateToShort, mappEmotiontoAValue } from './mood.js';
 import { createChart } from './chartUtils.js';
-import { loadJournalTemplate,fetchJournals } from './journal.js';
+import { loadJournalTemplate,fetchJournals,JournalFetchandPopulation } from './journal.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
     const logout = document.querySelector("#logout");
@@ -26,8 +26,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (moodLogs?.data && Array.isArray(moodLogs.data) && moodLogs.data.length > 0) {
             // Access the last mood log
             const lastMood = moodLogs.data[moodLogs.data.length - 1];
-            console.log(formatDateToShort(lastMood.timestamp))
-            dateofLastMoodLog.textContent = await  formatDateToShort(lastMood.timestamp);
+            if(dateofLastMoodLog)
+                dateofLastMoodLog.textContent = await  formatDateToShort(lastMood.timestamp);
         } else {
             console.log('No mood logs found.');
         }
@@ -46,7 +46,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         //=====================================================graphs===============================================
         const insight = document.querySelector(".insights");
-        insight.innerHTML = "";
+        if(insight)
+            insight.innerHTML = "";
 
             const moodlogs = await getWeeklyMoodLogs(token);
             const emotionalData = [];
@@ -190,44 +191,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             }        
         }
-
+        //==================================================journal ======================================================
         journal.addEventListener("click", async () => {
             await loadJournalTemplate();
-            const journalsFetched = await fetchJournals(token)
-
-            if(journalsFetched && Array.isArray(journalsFetched.data))
-            {
-                const journals = journalsFetched.data
-
-                const journalEntries = document.querySelector("#journalEntries");
-                journalEntries.innerHTML = "";
-
-                for(let i = 0; i < journals.length; i++)
-                {
-                    console.log(journals[i]);
-                    const journalContent = document.createElement("div");
-                    journalContent.id = "journal-content";
-
-                    const content = document.createElement("p");
-                    content.id = content;
-                    content.textContent = journals[i].content;
-
-                    const timestamp = document.createElement('span');
-                    timestamp.textContent = journals[i].timestamp;
-
-                    journalContent.appendChild(content);
-                    journalContent.appendChild(timestamp);
-
-                    const deleteBtn = document.createElement("button");
-                    deleteBtn.id = "deleteJournalBtn"
-
-                    journalEntries.appendChild(journalContent);
-                    journalEntries.appendChild(deleteBtn);
-                }
-                
-
-            }
+            await JournalFetchandPopulation(token);
         });
+
+        
     } catch (error) {
         console.error("Error during page initialization:", error);
     }

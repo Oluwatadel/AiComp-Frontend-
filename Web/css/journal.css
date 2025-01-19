@@ -52,6 +52,7 @@ h1, h2 {
     max-height: 50vh;
     background: var(--color-white);
     background-color: var(--color-background);
+    overflow-y: auto;
 }
 
 .journal-list h2{
@@ -75,7 +76,8 @@ h1, h2 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 94%;
+    width: 90%;
+    padding-left: 10px;
 }
 
 p#content {
@@ -116,23 +118,17 @@ input, textarea {
     padding: 10px;
     cursor: pointer;
     border-radius: 5px;
-    margin: 12px 0;
+    margin: 5px 0;
 }
 
-#addJournalBtn:hover,
+#addJournalBtn:hover{
+    background: #075e54;
+}
+
 #deleteJournalBtn:hover {
     background: #075e54;
 }
 
-.delete-btn {
-    background: red;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 3px;
-}
-
-.delete-btn:hover {
-    background: darkred;
+#deleteJournalBtn{
+    margin-right: 10px;
 }

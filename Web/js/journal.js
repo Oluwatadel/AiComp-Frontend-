@@ -1,4 +1,5 @@
 import { dateTime } from "./dashboard.js";
+import { formatDateToShort } from "./mood.js";
 export async function loadJournalTemplate()
 {
     const templatePath = "/Web/templates/journal.html";
@@ -34,4 +35,58 @@ export async function fetchJournals(token)
     } else {
         console.error(`${response.message}. Failed to fetch notifications.`);
     }
+}
+
+export async function JournalFetchandPopulation(token) {
+    const journalsFetched = await fetchJournals(token)
+
+            if(journalsFetched && Array.isArray(journalsFetched.data))
+            {
+                const journals = journalsFetched.data
+                const journalList = document.querySelector(".journal-list");
+
+
+                journalList.innerHTML = "";
+
+                for(let i = 0; i < journals.length; i++)
+                {
+                    console.log(journals[i]);
+                    const journalEntries = document.createElement("div");
+                    journalEntries.classList.add("journal-entry");
+                    journalEntries.id = "journalEntries";
+                    journalEntries.dataset.id = journals[i].id;
+
+                    const journalContent = document.createElement("div");
+                    journalContent.id = "journal-content";
+
+                    const content = document.createElement("p");
+                    content.id = content;
+                    content.textContent = journals[i].content;
+
+
+
+                    const timestamp = document.createElement('span');
+                    timestamp.textContent = await formatDateToShort(journals[i].timestamp);
+
+                    journalContent.appendChild(content);
+                    journalContent.appendChild(timestamp);
+
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.id = "deleteJournalBtn";
+                    deleteBtn.textContent = "Delete";
+
+                    journalEntries.appendChild(journalContent);
+                    journalEntries.appendChild(deleteBtn);
+                    journalEntries.style.borderRadius = "10px";
+                    journalEntries.style.marginTop = "10px";
+
+                    journalList.appendChild(journalEntries);
+
+                    if(i % 2 == 0)
+                    {
+                        journalEntries.style.borderBottom = "2px solid #7d89eb";
+                        journalEntries.style.backgroundColor = "#f0f0f0";
+                    }
+                }
+            }
 }

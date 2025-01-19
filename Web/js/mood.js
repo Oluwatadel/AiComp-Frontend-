@@ -4,112 +4,115 @@ import { createChart } from './chartUtils.js'
 const moodTemplate = "./templates/mood.html";
 const mood = document.querySelector("#mood");
 
-
-mood.addEventListener("click", async() => {
-    const token = await getToken();
-    await loadMoodTemplate(moodTemplate);
-    const moodlogs = await getWeeklyMoodLogs(token);
-    const emotionalData = [];
-    const intensityData = [];
-    const date = [];
-
-    if(moodlogs.data && Array.isArray(moodlogs.data))
-    {
-        const data = moodlogs.data;
-        for (let i = 0; i < data.length; i++) {
-          const log = data[i];
-          const inf = await mappEmotiontoAValue(log.emotion);
-          console.log(inf);
-          emotionalData[i] = inf;
-          intensityData[i] = log.intensity;
-          date[i] = await formatDateToShort(log.timestamp);
-      }
-    }
-    const weeklychart = document.querySelector(".weekly-chart");
-    const LineChart = document.querySelector("#emotion-Chart");
-    const chartLabel = 'Emotion';
-    const EmotionlineGraph = createChart(LineChart, "emotionalChart",'line',date, emotionalData,chartLabel)    
-
-    EmotionlineGraph.style.height = "260px";
+if(mood)
+{
+    mood.addEventListener("click", async() => {
+        const token = await getToken();
+        await loadMoodTemplate(moodTemplate);
+        const moodlogs = await getWeeklyMoodLogs(token);
+        const emotionalData = [];
+        const intensityData = [];
+        const date = [];
     
-
-    //=================================weekly intensity barchart=========================================================
-
-    const EmotionBarchart = document.createElement("div");
-    EmotionBarchart.className = "chart-Div";
-    EmotionBarchart.id = "chart2";
-    const weeklyIntensityCanvas = document.createElement('canvas');
-    const weeklyIntensityBarchart = createChart(weeklyIntensityCanvas, "emotionalChart",'bar',date, intensityData,"intensity")
-    weeklyIntensityBarchart.id = "intensitychart";
-    EmotionBarchart.appendChild(weeklyIntensityBarchart);
-    weeklychart.appendChild(EmotionBarchart);
-
-
-//===================================================Monthly Emotion line graph===============================================================
-    const secondChartDiv = document.querySelector(".monthly-chart");
-    const monthlyLineGraphy = document.createElement("div");
-    const moodlogsForAMonth = await getMonthlyMoodLogs(token);
-    const emotionalDataForTheMonth = [];
-    const intensityDataFroTheMont = [];
-    const listOfEmotionExperienceInAMonth = {};
-    const dateofData = [];
-
-    if(moodlogsForAMonth.data && Array.isArray(moodlogsForAMonth.data))
-    {
-        const data = moodlogsForAMonth.data;
-        for (let i = 0; i < data.length; i++) {
-          const log = data[i];
-          const inf = await mappEmotiontoAValue(log.emotion);
-          emotionalDataForTheMonth[i] = inf;
-          intensityDataFroTheMont[i] = log.intensity;
-          if(!listOfEmotionExperienceInAMonth[log.emotion])
-          {
-              listOfEmotionExperienceInAMonth[log.emotion] = 1
+        if(moodlogs.data && Array.isArray(moodlogs.data))
+        {
+            const data = moodlogs.data;
+            for (let i = 0; i < data.length; i++) {
+              const log = data[i];
+              const inf = await mappEmotiontoAValue(log.emotion);
+              console.log(inf);
+              emotionalData[i] = inf;
+              intensityData[i] = log.intensity;
+              date[i] = await formatDateToShort(log.timestamp);
           }
-          else
-          {
-              listOfEmotionExperienceInAMonth[log.emotion] += 1;
-          }
-          dateofData[i] = await formatDateToShort(log.timestamp);
         }
-        var properties = Object.keys(listOfEmotionExperienceInAMonth);
-        var values = Object.values(listOfEmotionExperienceInAMonth);
-
-    }
-
-
-    monthlyLineGraphy.className = "chart-Div2";
-    monthlyLineGraphy.id = "chart3";
-    const monthlyLineChart = document.createElement('canvas');
-    const monthlyEmotionLineGraph = createChart(monthlyLineChart, "monthlyEmotionLineGraph",'line',dateofData, emotionalDataForTheMonth,"Occurence of Emotion");
-    monthlyEmotionLineGraph.id = "monthlyEmotionLineGraph";
+        const weeklychart = document.querySelector(".weekly-chart");
+        const LineChart = document.querySelector("#emotion-Chart");
+        const chartLabel = 'Emotion';
+        const EmotionlineGraph = createChart(LineChart, "emotionalChart",'line',date, emotionalData,chartLabel)    
     
+        EmotionlineGraph.style.height = "260px";
+        
+    
+        //=================================weekly intensity barchart=========================================================
+    
+        const EmotionBarchart = document.createElement("div");
+        EmotionBarchart.className = "chart-Div";
+        EmotionBarchart.id = "chart2";
+        const weeklyIntensityCanvas = document.createElement('canvas');
+        const weeklyIntensityBarchart = createChart(weeklyIntensityCanvas, "emotionalChart",'bar',date, intensityData,"intensity")
+        weeklyIntensityBarchart.id = "intensitychart";
+        EmotionBarchart.appendChild(weeklyIntensityBarchart);
+        weeklychart.appendChild(EmotionBarchart);
+    
+    
+    //===================================================Monthly Emotion line graph===============================================================
+        const secondChartDiv = document.querySelector(".monthly-chart");
+        const monthlyLineGraphy = document.createElement("div");
+        const moodlogsForAMonth = await getMonthlyMoodLogs(token);
+        const emotionalDataForTheMonth = [];
+        const intensityDataFroTheMont = [];
+        const listOfEmotionExperienceInAMonth = {};
+        const dateofData = [];
+    
+        if(moodlogsForAMonth.data && Array.isArray(moodlogsForAMonth.data))
+        {
+            const data = moodlogsForAMonth.data;
+            for (let i = 0; i < data.length; i++) {
+              const log = data[i];
+              const inf = await mappEmotiontoAValue(log.emotion);
+              emotionalDataForTheMonth[i] = inf;
+              intensityDataFroTheMont[i] = log.intensity;
+              if(!listOfEmotionExperienceInAMonth[log.emotion])
+              {
+                  listOfEmotionExperienceInAMonth[log.emotion] = 1
+              }
+              else
+              {
+                  listOfEmotionExperienceInAMonth[log.emotion] += 1;
+              }
+              dateofData[i] = await formatDateToShort(log.timestamp);
+            }
+            var properties = Object.keys(listOfEmotionExperienceInAMonth);
+            var values = Object.values(listOfEmotionExperienceInAMonth);
+    
+        }
+    
+    
+        monthlyLineGraphy.className = "chart-Div2";
+        monthlyLineGraphy.id = "chart3";
+        const monthlyLineChart = document.createElement('canvas');
+        const monthlyEmotionLineGraph = createChart(monthlyLineChart, "monthlyEmotionLineGraph",'line',dateofData, emotionalDataForTheMonth,"Occurence of Emotion");
+        monthlyEmotionLineGraph.id = "monthlyEmotionLineGraph";
+        
+    
+    
+        monthlyLineGraphy.appendChild(monthlyEmotionLineGraph);
+    
+        monthlyEmotionLineGraph.style.width = '600px';
+        monthlyEmotionLineGraph.style.height = '260px';
+    
+    //=======================================================pie chart Monthly===========================================
+    const monthlyPieChart = document.createElement("div");
+    monthlyPieChart.className = "chart-Div2";
+    monthlyPieChart.id = "piechart";
+    const monthlyEmotionPieChart = document.createElement('canvas');
+    const monthlyEmotionPieGraph = createChart(monthlyEmotionPieChart, "monthlyEmotionPieGraph",'doughnut',properties, values,"Emotion");
+    monthlyEmotionPieGraph.id = "monthlyEmotionPieGraph";
+    
+    
+    monthlyPieChart.appendChild(monthlyEmotionPieGraph);
+    
+    monthlyEmotionPieGraph.style.width = '300px';
+    monthlyEmotionPieGraph.style.height = '250px';
+    
+    
+    secondChartDiv.appendChild(monthlyLineGraphy);
+    secondChartDiv.appendChild(monthlyPieChart);
+    
+    })
+}
 
-
-    monthlyLineGraphy.appendChild(monthlyEmotionLineGraph);
-
-    monthlyEmotionLineGraph.style.width = '600px';
-    monthlyEmotionLineGraph.style.height = '260px';
-
-//=======================================================pie chart Monthly===========================================
-const monthlyPieChart = document.createElement("div");
-monthlyPieChart.className = "chart-Div2";
-monthlyPieChart.id = "piechart";
-const monthlyEmotionPieChart = document.createElement('canvas');
-const monthlyEmotionPieGraph = createChart(monthlyEmotionPieChart, "monthlyEmotionPieGraph",'doughnut',properties, values,"Emotion");
-monthlyEmotionPieGraph.id = "monthlyEmotionPieGraph";
-
-
-monthlyPieChart.appendChild(monthlyEmotionPieGraph);
-
-monthlyEmotionPieGraph.style.width = '300px';
-monthlyEmotionPieGraph.style.height = '250px';
-
-
-secondChartDiv.appendChild(monthlyLineGraphy);
-secondChartDiv.appendChild(monthlyPieChart);
-
-})
 
 
 async function loadMoodTemplate(moodTemplate)
