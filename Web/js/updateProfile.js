@@ -1,4 +1,4 @@
-import {getToken,getProfile,getProfilePic} from './dashboard.js';
+import {getToken, getProfile, getProfilePic} from './dashboard.js';
 document.addEventListener("DOMContentLoaded", async () => {
     const profileImageInput = document.querySelector("#profilePicInput");
     const profileImage = document.querySelector("#profileImage");
@@ -76,32 +76,22 @@ document.addEventListener("DOMContentLoaded", async () => {
             if(!resp.ok)
             {
                 return resp.json().then(errorData => {
+                    showModal(false, errorData.message);
                     throw new Error(errorData.message); // Propagate the error to the next .catch()
                 });
             }
             return resp.json(); // Parse response JSON on success
         })
         .then(data => {
-            console.log(data.message);
+            showModal(true, data.message);
             location.href = "/Web/dashboard.html";
         })
         .catch(error => {
             errorDisplay.textContent = error.message;
             errorDisplay.style.color = "red";
+            showModal(true, error.message);
             console.error("Error: Something went wrong"); // Log any error that occurs
         });
-
-            // if(response.ok){
-            //     const data = await response.json();
-            //     console.log(data.data);
-            //     location.href = "dashboard";
-            // }
-            // else
-            // {
-            //     const errorData = await response.json();
-            //     console.log(errorData.message)
-            // }
-
     })
 
 

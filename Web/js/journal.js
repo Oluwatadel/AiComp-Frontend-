@@ -21,7 +21,7 @@ export async function loadJournalTemplate()
 
 export async function fetchJournals(token)
 {
-    const url = "https://localhost:7173/api/Journal"
+    const url = "https://localhost:7173/api/Journal/view/journals"
     const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -37,7 +37,7 @@ export async function fetchJournals(token)
     }
 }
 
-export async function JournalFetchandPopulation(token) {
+export async function journalFetchandPopulation(token) {
     const journalsFetched = await fetchJournals(token)
 
             if(journalsFetched && Array.isArray(journalsFetched.data))
@@ -89,4 +89,24 @@ export async function JournalFetchandPopulation(token) {
                     }
                 }
             }
+}
+
+export async function addJournal(token, journalObject)
+{
+    const response = await fetch("https://localhost:7173/api/Journal/add/journal", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(journalObject)
+    });
+
+    if (!response.ok) {
+        const error = await response.json();  // Parse the response
+        return { status: false, response }
+    }
+
+    const data = await response.json();
+    return { status: true, data }; 
 }

@@ -1,4 +1,4 @@
-
+import { getToken } from "./dashboard.js";
 document.addEventListener("DOMContentLoaded", async () => {
     const profileImageInput = document.querySelector("#profilePicInput");
     const profileImage = document.querySelector("#profileImage");
@@ -16,11 +16,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const form = document.querySelector("#form");
     const errorDisplay = document.querySelector("#error");
 
-
-        form.addEventListener("submit", (e) =>{
+    const token = await getToken()
+    form.addEventListener("submit", (e) =>{
         console.log("Entered");
         e.preventDefault();
-        console.log(token);
 //formData should be used because JsonStrigify() wont work on file so formData should be created instead of object
 
         const formData = new FormData(form);
@@ -54,32 +53,46 @@ document.addEventListener("DOMContentLoaded", async () => {
             if(!resp.ok)
             {
                 return resp.json().then(errorData => {
+                    Swal.fire({
+                        title: 'Oops...',
+                        text: errorData.message,
+                        icon: 'error',
+                        confirmButtonText: 'Try again',
+                        timer: 3000,  // Close modal after 3 seconds
+                        willClose: () => {
+                        }
+                    }); 
                     throw new Error(errorData.message); // Propagate the error to the next .catch()
                 });
             }
             return resp.json(); // Parse response JSON on success
         })
         .then(data => {
-            console.log(data.message);
-            location.href = "/Web/dashboard.html";
+            Swal.fire({
+                title: 'Success!',
+                text: `${data.message}`,
+                icon: 'success',
+                confirmButtonText: 'OK',
+                timer: 3000,  // Close modal after 3 seconds
+                willClose: () => {
+                   location.href = '/Web/dashboard.html';  // Redirect after modal closes
+                }
+            });
         })
         .catch(error => {
             errorDisplay.textContent = error.message;
             errorDisplay.style.color = "red";
+            Swal.fire({
+                title: 'Oops...',
+                text: error.message,
+                icon: 'error',
+                confirmButtonText: 'Try again',
+                timer: 3000,  // Close modal after 3 seconds
+                willClose: () => {
+                }
+            }); 
             console.error("Error: Something went wrong"); // Log any error that occurs
         });
-
-            // if(response.ok){
-            //     const data = await response.json();
-            //     console.log(data.data);
-            //     location.href = "dashboard";
-            // }
-            // else
-            // {
-            //     const errorData = await response.json();
-            //     console.log(errorData.message)
-            // }
-
     })
 
 

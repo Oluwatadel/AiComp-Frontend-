@@ -19,6 +19,8 @@
 <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="css/util.css">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<link rel="stylesheet" type="text/css" href="css/modal.css">
+
 <!--===============================================================================================-->
 </head>
 <body>
@@ -87,18 +89,7 @@
 		</div>
 	</div>
 
-	<!-- Pop-up Modal -->
-	<div id="messageModal" class="modal" style="display: none;">
-		<div class="modal-content">
-			<span class="close">&times;</span>
-			<div id="iconContainer" style="font-size: 50px; margin-bottom: 10px;"></div>
-			<p id="modalMessage"></p>
-		</div>
-	</div>
-	
-	
-
-	
+		
 <!--===============================================================================================-->	
 	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
 <!--===============================================================================================-->
@@ -116,7 +107,11 @@
 <!--===============================================================================================-->
 	<script src="js/main.js"></script>
 	<script type="module" src="js/login.js"></script>
-	<script src="js/gateway.js"></script>
+	<script type="module" src="js/gateway.js"></script>
+	<script type="module" src="./js/utils.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 </body>
 </html>

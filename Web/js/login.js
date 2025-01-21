@@ -1,4 +1,6 @@
-import { getProfile } from "./dashboard";
+import { getProfile } from "./dashboard.js";
+import { response } from "./gateway.js"; 
+
 
     document.addEventListener("DOMContentLoaded", (e) => {
         let loginForm = document.querySelector(".login100-form.validate-form");
@@ -13,10 +15,6 @@ import { getProfile } from "./dashboard";
             console.log(email);
             loginUserName.value = email;
             localStorage.removeItem('registeredEmail'); 
-        }
-        else
-        {
-            console.log("No email in the storage");
         }
 
         loginUserName.addEventListener('input', () =>{
@@ -58,27 +56,52 @@ import { getProfile } from "./dashboard";
                        //Check if the user has a e
                        const token = response.data.accessToken.result;
                        const userProfile = await getProfile(token);
-                        if(userProfile.ok){
-                            console.log("Profile exists, redirecting to dashboard.");
-                            location.href ='/Web/dashboard.html';          
+                       console.log(userProfile);
+                        if(userProfile){
+                            Swal.fire({
+                                title: 'Welcome!',
+                                text: `Welcome ${userProfile.data.firstName}`,
+                                icon: 'success',
+                                confirmButtonText: 'OK',
+                                timer: 3000,  // Close modal after 3 seconds
+                                willClose: () => {
+                                   location.href = '/Web/dashboard.html';  // Redirect after modal closes
+                                }
+                            });          
                         } 
                         else
                         {
-                            console.log("Profile is null, redirecting to profile creation.");
-                            location.href = '/Web/create-profile.html';  // Redirect to the profile creation page                             
+                            Swal.fire({
+                                title: 'Welcome!',
+                                text: `Welcome ${loginUserName.value}`,
+                                icon: 'success',
+                                confirmButtonText: 'OK',
+                                timer: 3000,  // Close modal after 3 seconds
+                                willClose: () => {
+                                    location.href = '/Web/create-profile.html';  // Redirect after modal closes
+                                }
+                            });   // Redirect to the profile creation page                             
                         }
 
                     }
-                    else if(shareData.statusCode === 401)
+                    else if(shareData.statusCode === 401 || !shareData.ok)
                     {
-                        emailError.textContent = shareData.message
+                        Swal.fire({
+                            title: 'Oops...',
+                            text: 'Sorry!\nEmail or Password not valid',
+                            icon: 'error',
+                            confirmButtonText: 'Try again',
+                            timer: 3000,  // Close modal after 3 seconds
+                            willClose: () => {
+                            }
+                        });   
+                        showModal(false, "Sorry!\nEmail or Password not valid");
                     }
 
         
                 });
                 
             }
-        
             else
             {
                 console.error("Login form not found");

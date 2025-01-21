@@ -1,4 +1,5 @@
-
+import { showModal } from "./utils.js";
+import {registration, emailCheck} from "./gateway.js"
 document.addEventListener("DOMContentLoaded", (e) => {
     let registrationForm = document.querySelector("#form");
     let email = document.querySelector("#email");
@@ -61,30 +62,21 @@ document.addEventListener("DOMContentLoaded", (e) => {
 })
 
 
-let regResponse = async (registrationDetails) => {
-    const resp = await fetch("https://localhost:7173/api/auth/register", {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(registrationDetails),
-    });
-    console.log("Request sent now");
+async function regResponse(registrationDetails) {
+    const resp = await registration(registrationDetails);
+    console.log(resp);
 
-    if(resp.ok)
+    if(resp.status)
     {
-        const data = await resp.json();
+        const data = resp.data
         localStorage.setItem('registeredEmail', data.data.email); //This is to save the user the stress of inputting email in the login page
+        showModal(true, "Registration successful");
         window.location.href = "/Web/login.html";
-    }
-    else if(resp.ok === 400)
-    {
-        const errorData = await response.json()
-        console.log("Registration not successfull", errorData.message)
     }
     else
     {
-        console.log(resp.message);
+        const errorData = resp.error;
+        showModal(false, errorData.message);
     }
 
 }

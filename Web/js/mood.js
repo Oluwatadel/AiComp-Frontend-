@@ -14,9 +14,9 @@ if(mood)
         const intensityData = [];
         const date = [];
     
-        if(moodlogs.data && Array.isArray(moodlogs.data))
+        if(moodlogs.data.data && Array.isArray(moodlogs.data.data))
         {
-            const data = moodlogs.data;
+            const data = moodlogs.data.data;
             for (let i = 0; i < data.length; i++) {
               const log = data[i];
               const inf = await mappEmotiontoAValue(log.emotion);
@@ -26,6 +26,7 @@ if(mood)
               date[i] = await formatDateToShort(log.timestamp);
           }
         }
+
         const weeklychart = document.querySelector(".weekly-chart");
         const LineChart = document.querySelector("#emotion-Chart");
         const chartLabel = 'Emotion';
@@ -76,8 +77,7 @@ if(mood)
             var properties = Object.keys(listOfEmotionExperienceInAMonth);
             var values = Object.values(listOfEmotionExperienceInAMonth);
     
-        }
-    
+        }    
     
         monthlyLineGraphy.className = "chart-Div2";
         monthlyLineGraphy.id = "chart3";
@@ -159,21 +159,19 @@ export async function getAllMoodLogs(token)
 export async function getWeeklyMoodLogs(token)
 {
     const response = await fetch("https://localhost:7173/api/moods/weekly", {
-    method: "Get",
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
+        method: "Get",
+        headers: {
+        'Authorization': `Bearer ${token}`,
+        }
     });
 
-    if(!response.ok)
-    {
-        const resp = await response.json();
-        console.error("error", resp)
-        return resp;
+    if (!response.ok) {
+        const error = await response.json();  // Parse the response
+        return { status: false, error }
     }
 
     const data = await response.json();
-    return data;
+    return { status: true, data };
 }
 
 //================================================================Monthly==========================================================

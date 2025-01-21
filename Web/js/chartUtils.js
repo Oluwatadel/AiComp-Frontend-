@@ -9,6 +9,7 @@
  * @param {object} [options={}] - Additional chart options.
  * @returns {HTMLElement} - The container element with the chart.
  */
+
 export function createChart(container, chartId, chartType, labels, data, chartLabel, options = {}) {
     
     // Create the chart dynamically

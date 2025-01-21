@@ -1,6 +1,6 @@
 import { getWeeklyMoodLogs, formatDateToShort, mappEmotiontoAValue } from './mood.js';
 import { createChart } from './chartUtils.js';
-import { loadJournalTemplate,fetchJournals,JournalFetchandPopulation } from './journal.js';
+import { loadJournalTemplate,fetchJournals,journalFetchandPopulation,addJournal } from './journal.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
     const logout = document.querySelector("#logout");
@@ -15,10 +15,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const update = document.querySelector("#updateContainer");
     const journal = document.querySelector("#journal");
 
+
     try {
         // Set current date
         if(date)
-            date.value = dateTime();
+            date.textContent = dateTime();
 
         // Retrieve token
         const token = await getToken();
@@ -27,9 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Access the last mood log
             const lastMood = moodLogs.data[moodLogs.data.length - 1];
             if(dateofLastMoodLog)
-                dateofLastMoodLog.textContent = await  formatDateToShort(lastMood.timestamp);
-        } else {
-            console.log('No mood logs found.');
+                dateofLastMoodLog.textContent = await formatDateToShort(lastMood.timestamp);
         }
         // Fetch user profile details
         const profileDetails = await getProfile(token);
@@ -47,82 +46,109 @@ document.addEventListener("DOMContentLoaded", async () => {
         //=====================================================graphs===============================================
         const insight = document.querySelector(".insights");
         if(insight)
+        {
             insight.innerHTML = "";
-
+            const weeklychart = document.createElement("div");
+            weeklychart.className = "logs";
             const moodlogs = await getWeeklyMoodLogs(token);
-            const emotionalData = [];
-            const intensityData = [];
-            const dateOfEmotion = [];
-            const listOfEmotionExperienceForTheWeek = {};
-            let properties = Object.keys(listOfEmotionExperienceForTheWeek);
-            let values = Object.values(listOfEmotionExperienceForTheWeek);
-        
-            if(moodlogs.data && Array.isArray(moodlogs.data))
+            const weeklyPiechart = document.createElement("div");
+            weeklyPiechart.className = "pielog";
+            if(moodlogs.status)
             {
-                const data = moodlogs.data;
-                for (let i = 0; i < data.length; i++) {
-                  const log = data[i];
-                  const inf = await mappEmotiontoAValue(log.emotion);
-                  console.log(inf);
-                  emotionalData[i] = inf;
-                  intensityData[i] = log.intensity;
-                  if(!listOfEmotionExperienceForTheWeek[log.emotion])
-                  {
-                    listOfEmotionExperienceForTheWeek[log.emotion] = 1
-                  }
-                  else
-                  {
-                        listOfEmotionExperienceForTheWeek[log.emotion] += 1;
-                  }
-                  dateOfEmotion[i] = await formatDateToShort(log.timestamp);
-                  properties = Object.keys(listOfEmotionExperienceForTheWeek);
-                  values = Object.values(listOfEmotionExperienceForTheWeek);
-              }
-            }
+                const moodLogData = moodlogs.data.data; 
+                const emotionalData = [];
+                const intensityData = [];
+                const dateOfEmotion = [];
+                const listOfEmotionExperienceForTheWeek = {};
+                let properties = Object.keys(listOfEmotionExperienceForTheWeek);
+                let values = Object.values(listOfEmotionExperienceForTheWeek);
+            
+                if(moodLogData && Array.isArray(moodLogData))
+                {
+                    const data = moodLogData;
+                    for (let i = 0; i < data.length; i++) {
+                    const log = data[i];
+                    const inf = await mappEmotiontoAValue(log.emotion);
+                    console.log(inf);
+                    emotionalData[i] = inf;
+                    intensityData[i] = log.intensity;
+                    if(!listOfEmotionExperienceForTheWeek[log.emotion])
+                    {
+                        listOfEmotionExperienceForTheWeek[log.emotion] = 1
+                    }
+                    else
+                    {
+                            listOfEmotionExperienceForTheWeek[log.emotion] += 1;
+                    }
+                    dateOfEmotion[i] = await formatDateToShort(log.timestamp);
+                    properties = Object.keys(listOfEmotionExperienceForTheWeek);
+                    values = Object.values(listOfEmotionExperienceForTheWeek);
+                }
+                }
 
-        const weeklychart = document.createElement("div");
-        weeklychart.className = "logs";
-        const LineChart = document.createElement("canvas");
-        const chartLabel = 'Emotion';
-        const EmotionlineGraph = createChart(LineChart, "emotionalChart",'line',dateOfEmotion, emotionalData,chartLabel);
-        const textSpan = document.createElement("span");
-        textSpan.className = "text-muted"
-        textSpan.textContent = "Weekly emotion"
+                
+                const LineChart = document.createElement("canvas");
+                const chartLabel = 'Emotion';
+                const EmotionlineGraph = createChart(LineChart, "emotionalChart",'line',dateOfEmotion, emotionalData,chartLabel);
+                const textSpan = document.createElement("span");
+                textSpan.className = "text-muted"
+                textSpan.textContent = "Weekly emotion"
 
-        LineChart.style.width = "445px"
-        textSpan.style.borderRadius = 0;
-        textSpan.style.fontSize = "1rem";
-        textSpan.style.display = "block";
-        textSpan.style.textAlign = "center";
-        textSpan.style.background = "none";
-        textSpan.style.color = "#03115a";
+                LineChart.style.width = "445px"
+                textSpan.style.borderRadius = 0;
+                textSpan.style.fontSize = "1rem";
+                textSpan.style.display = "block";
+                textSpan.style.textAlign = "center";
+                textSpan.style.background = "none";
+                textSpan.style.color = "#03115a";
 
-        weeklychart.appendChild(EmotionlineGraph);
-        weeklychart.appendChild(textSpan);
+                weeklychart.appendChild(EmotionlineGraph);
+                weeklychart.appendChild(textSpan);
 
 
-        const weeklyPiechart = document.createElement("div");
-        weeklyPiechart.className = "pielog";
-        const pieChart = document.createElement("canvas");
-        const graphLabel = 'Occurence of Emotion';
-        const EmotionpieGraph = createChart(pieChart, "emotionalPieChart",'doughnut',properties, values, graphLabel);
-        const textSpan2 = document.createElement("span");
-        textSpan2.className = "text-muted"
-        textSpan2.textContent = "Weekly emotion"
+                
+                const pieChart = document.createElement("canvas");
+                const graphLabel = 'Occurence of Emotion';
+                const EmotionpieGraph = createChart(pieChart, "emotionalPieChart",'doughnut',properties, values, graphLabel);
+                const textSpan2 = document.createElement("span");
+                textSpan2.className = "text-muted"
+                textSpan2.textContent = "Weekly emotion"
 
-        EmotionpieGraph.style.width = "270px";
-        EmotionpieGraph.style.height = "250px";
+                EmotionpieGraph.style.width = "270px";
+                EmotionpieGraph.style.height = "250px";
 
-        weeklyPiechart.appendChild(EmotionpieGraph)
-        insight.appendChild(weeklychart);
-        insight.appendChild(weeklyPiechart);
-        
+                weeklyPiechart.appendChild(EmotionpieGraph)
+                insight.appendChild(weeklychart);
+                insight.appendChild(weeklyPiechart);
+            }   
+            else
+            {
+
+                const weeklychartMessage = document.createElement("h3");
+                weeklychartMessage.className = "span-message";
+                weeklychartMessage.textContent = "No Mood Log yet";
+
+                const weeklyPiechartMessage = document.createElement("h3");
+                weeklyPiechartMessage.className = "span-message";
+                weeklyPiechartMessage.textContent = "No Mood Log yet";
+
+                weeklychart.appendChild(weeklychartMessage);
+                weeklyPiechart.appendChild(weeklyPiechartMessage);
+
+                insight.appendChild(weeklychart);
+                insight.appendChild(weeklyPiechart);
+
+                insight.style.gridTemplateColumns = "none"
+            }   
+        }
 
 
 
         // Fetch daily mood messages
-        await fetchMoodMessages(token, profPics, chatWindow, messageInput);
-        messageInput.setAttribute("autocomplete", "off"); //Suggestion of previous input not needed
+        if(chatWindow)
+        {
+            await fetchMoodMessages(token, profPics, chatWindow, messageInput);
+            messageInput.setAttribute("autocomplete", "off"); //Suggestion of previous input not needed
         if(messageInput.value === "")
             send.disabled = true;
         if(messageInput && send)
@@ -144,59 +170,117 @@ document.addEventListener("DOMContentLoaded", async () => {
             chatWindow.insertAdjacentHTML("beforeend", scrollElementHTML);
             const scrollElement = chatWindow.querySelector("main");
             scrollElement.scrollIntoView();
+        }
+        
 
     //==========================================================Update section=====================================================
             update.innerHTML = "";
             const notifications = await LoadNotifications(token);
-            
-
-            if(notifications.data && Array.isArray(notifications.data))
+            console.log(notifications)
+            if(!notifications.status)
             {
-                const userNotifications = notifications.data
-
-                
-                for(let i = 0; i < userNotifications.length; i++)
+                const innermessage = document.createElement("p");
+                innermessage.textContent = "No update";
+                update.appendChild(innermessage);
+            }
+            else
+            {
+                if(notifications.data && Array.isArray(notifications.data))
                 {
-                    const innerUpdateContainer = document.createElement("div");
-                    innerUpdateContainer.className = "update";
-            //=========================recent update profile pic========================= 
-                    const profilePicture = document.createElement("div");
-                    profilePicture.className = "profile-photo";
-
-                    const profileImg = document.createElement("img");
-                    profileImg.src = profPics;
-                  //=================Append the profileImg in the div profilepicture=====
-                    profilePicture.appendChild(profileImg);
-
-            //=========================recent update message========================= 
-                    const message = document.createElement("div");
-                    message.className = "message";
-
-                    const messageTag = document.createElement("p");
-                    // messageTag.className = "messageTag";
-                    messageTag.textContent = userNotifications[i].description;
-                    message.appendChild(messageTag);
-
-                    const textMuted = document.createElement("small");
-                    textMuted.className = "text-muted";
-                    textMuted.textContent = await presentTimeAgo(userNotifications[i].timestamp);
-                    message.appendChild(textMuted);
-
-                  //=============================Append all child to outer contaier==============================
-                    innerUpdateContainer.appendChild(profilePicture);
-                    innerUpdateContainer.appendChild(message);
-
-            //=========================Append inner container to the inner container========================= 
-                    update.appendChild(innerUpdateContainer);
+                    const userNotifications = notifications.data                        
+                    for(let i = 0; i < userNotifications.length; i++)
+                    {
+                        const innerUpdateContainer = document.createElement("div");
+                        innerUpdateContainer.className = "update";
+                    //=========================recent update profile pic========================= 
+                        const profilePicture = document.createElement("div");
+                        profilePicture.className = "profile-photo";
+        
+                        const profileImg = document.createElement("img");
+                        profileImg.src = profPics;
+                    //=================Append the profileImg in the div profilepicture=====
+                        profilePicture.appendChild(profileImg);
+        
+                    //=========================recent update message========================= 
+                        const message = document.createElement("div");
+                        message.className = "message";
+        
+                        const messageTag = document.createElement("p");
+                            // messageTag.className = "messageTag";
+                        messageTag.textContent = userNotifications[i].description;
+                        message.appendChild(messageTag);
+        
+                        const textMuted = document.createElement("small");
+                        textMuted.className = "text-muted";
+                        textMuted.textContent = await presentTimeAgo(userNotifications[i].timestamp);
+                        message.appendChild(textMuted);
+        
+                     //=============================Append all child to outer contaier==============================
+                        innerUpdateContainer.appendChild(profilePicture);
+                        innerUpdateContainer.appendChild(message);
+        
+                    //=========================Append inner container to the inner container========================= 
+                        update.appendChild(innerUpdateContainer);
+                    }
                 }
             }        
         }
         //==================================================journal ======================================================
-        journal.addEventListener("click", async () => {
-            await loadJournalTemplate();
-            await JournalFetchandPopulation(token);
-        });
-
+        if (journal) {
+            journal.addEventListener("click", async () => {
+                await loadJournalTemplate();
+                await journalFetchandPopulation(token);
+        
+                const journalTitle = document.querySelector("#journalTitle");
+                const addJournalBtn = document.querySelector("#addJournalBtn");
+                const deleteJournalBtn = document.querySelector("#deleteJournalBtn");
+                const journalContent = document.querySelector("#journalTextArea");
+        
+                if (journalContent && journalTitle && addJournalBtn) {
+                    journalContent.addEventListener("input", () => {
+                        addJournalBtn.disabled = !(journalTitle.value.trim() && journalContent.value.trim());
+                    });
+        
+                    journalTitle.addEventListener("input", () => {
+                        addJournalBtn.disabled = !(journalTitle.value.trim() && journalContent.value.trim());
+                    });
+        
+                    addJournalBtn.addEventListener("click", async () => {
+                        const journalRequest = {
+                            title: journalTitle.value,
+                            content: journalContent.value
+                        };
+        
+                        const response = await addJournal(token, journalRequest);
+        
+                        if (response.status) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Journal added successfully',
+                                icon: 'success',
+                                confirmButtonText: 'OK',
+                                timer: 3000,  // Close modal after 3 seconds
+                            });
+                            await journalFetchandPopulation(token);
+                        }
+                        else
+                        {
+                            console.log(response)
+                            const errorMessage = response.data.message;
+                            Swal.fire({
+                                title: 'Oops...',
+                                text: errorMessage,
+                                icon: 'error',
+                                confirmButtonText: 'Try again',
+                                timer: 3000,  // Close modal after 3 seconds
+                                willClose: () => {
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
         
     } catch (error) {
         console.error("Error during page initialization:", error);
@@ -694,10 +778,17 @@ export async function LoadNotifications(token) {
         },
     });
     if (response.ok) {
+        console.log(response)
+        if(response.status === 204)
+        {
+            return {status: false};
+        }
         const data = await response.json();
-        return data;
+        return {status: true, data};
     } else {
+        const data = await response.json();
         console.error(`${response.message}. Failed to fetch notifications.`);
+        return {status: false, data}
     }
 }
 
