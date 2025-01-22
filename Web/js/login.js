@@ -95,7 +95,6 @@ import { response } from "./gateway.js";
                             willClose: () => {
                             }
                         });   
-                        showModal(false, "Sorry!\nEmail or Password not valid");
                     }
 
         

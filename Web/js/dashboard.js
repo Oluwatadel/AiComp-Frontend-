@@ -1,6 +1,6 @@
 import { getWeeklyMoodLogs, formatDateToShort, mappEmotiontoAValue } from './mood.js';
 import { createChart } from './chartUtils.js';
-import { loadJournalTemplate,fetchJournals,journalFetchandPopulation,addJournal } from './journal.js';
+import { loadJournalTemplate,fetchJournals,journalFetchandPopulation,addJournal, deleteJournal } from './journal.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
     const logout = document.querySelector("#logout");
@@ -123,7 +123,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }   
             else
             {
-
                 const weeklychartMessage = document.createElement("h3");
                 weeklychartMessage.className = "span-message";
                 weeklychartMessage.textContent = "No Mood Log yet";
@@ -149,34 +148,33 @@ document.addEventListener("DOMContentLoaded", async () => {
         {
             await fetchMoodMessages(token, profPics, chatWindow, messageInput);
             messageInput.setAttribute("autocomplete", "off"); //Suggestion of previous input not needed
-        if(messageInput.value === "")
-            send.disabled = true;
-        if(messageInput && send)
-        {
-            send.disabled = false;
+            if(messageInput.value === "")
+                send.disabled = true;
+            if(messageInput && send)
+            {
+                send.disabled = false;
 
-            send.addEventListener("click", () => {
-                handleSend(chatWindow, messageInput, token, profPics);
-            });
-
-            messageInput.addEventListener("keydown", (event) => {
-                if (event.key === "Enter") {
-                    event.preventDefault(); // Prevents default behavior of form submission if inside a form
+                send.addEventListener("click", () => {
                     handleSend(chatWindow, messageInput, token, profPics);
-                }
-            });
+                });
 
-            const scrollElementHTML = "<main></main>";
-            chatWindow.insertAdjacentHTML("beforeend", scrollElementHTML);
-            const scrollElement = chatWindow.querySelector("main");
-            scrollElement.scrollIntoView();
-        }
+                messageInput.addEventListener("keydown", (event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault(); // Prevents default behavior of form submission if inside a form
+                        handleSend(chatWindow, messageInput, token, profPics);
+                    }
+                });
+
+                const scrollElementHTML = "<main></main>";
+                chatWindow.insertAdjacentHTML("beforeend", scrollElementHTML);
+                const scrollElement = chatWindow.querySelector("main");
+                scrollElement.scrollIntoView();
+            }
         
 
     //==========================================================Update section=====================================================
             update.innerHTML = "";
             const notifications = await LoadNotifications(token);
-            console.log(notifications)
             if(!notifications.status)
             {
                 const innermessage = document.createElement("p");
@@ -185,10 +183,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             else
             {
-                if(notifications.data && Array.isArray(notifications.data))
+                if(notifications.data && Array.isArray(notifications.data.data))
                 {
-                    const userNotifications = notifications.data                        
-                    for(let i = 0; i < userNotifications.length; i++)
+                    const userNotifications = notifications.data.data                       
+                    for(let i = userNotifications.length - 1; i >= 0; i--)
                     {
                         const innerUpdateContainer = document.createElement("div");
                         innerUpdateContainer.className = "update";
@@ -220,7 +218,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         innerUpdateContainer.appendChild(message);
         
                     //=========================Append inner container to the inner container========================= 
-                        update.appendChild(innerUpdateContainer);
+                        update.prepend(innerUpdateContainer);
                     }
                 }
             }        
@@ -262,14 +260,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 timer: 3000,  // Close modal after 3 seconds
                             });
                             await journalFetchandPopulation(token);
+                            journalTitle.value = "";
+                            journalContent.value = "";
                         }
                         else
                         {
-                            console.log(response)
-                            const errorMessage = response.data.message;
+                            const errorMessage = response.error;
+                            console.log(errorMessage.message)
                             Swal.fire({
                                 title: 'Oops...',
-                                text: errorMessage,
+                                text: errorMessage.message,
                                 icon: 'error',
                                 confirmButtonText: 'Try again',
                                 timer: 3000,  // Close modal after 3 seconds
@@ -279,8 +279,50 @@ document.addEventListener("DOMContentLoaded", async () => {
                         }
                     });
                 }
+
+                const journalList = document.querySelector(".journal-list")
+                if (journalList) {
+                    journalList.addEventListener("click", async (event) => {
+                        if (event.target && event.target.matches("#deleteJournalBtn")) {
+                            const deleteJournalBtn = event.target;
+                            const journalId = deleteJournalBtn.dataset.id;
+                
+                            Swal.fire({
+                                title: "Are you sure?",
+                                text: "You won't be able to revert this!",
+                                icon: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#3085d6",
+                                cancelButtonColor: "#d33",
+                                confirmButtonText: "Yes, delete it!"
+                            }).then(async (result) => {
+                                if (result.isConfirmed) {
+                                    const resp = await deleteJournal(token, journalId);
+                
+                                    if (!resp.status) {
+                                        Swal.fire({
+                                            title: "Error!",
+                                            text: "Failed to delete the journal.",
+                                            icon: "error"
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            title: "Deleted!",
+                                            text: "The journal has been deleted.",
+                                            icon: "success"
+                                        });
+                
+                                        // Refresh the list after successful deletion
+                                        await journalFetchandPopulation(token);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
             });
         }
+        
         
     } catch (error) {
         console.error("Error during page initialization:", error);
@@ -387,7 +429,6 @@ async function fetchMoodMessages(token, profilePics, chatWindow, messageInput) {
 
     if (todaysMood.ok) {
         const data = await todaysMood.json();
-        console.log(data);
 
         // Clear the chat window
         if(chatWindow)
@@ -778,7 +819,6 @@ export async function LoadNotifications(token) {
         },
     });
     if (response.ok) {
-        console.log(response)
         if(response.status === 204)
         {
             return {status: false};

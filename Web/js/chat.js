@@ -152,7 +152,7 @@ async function sendButtonFunction(chatContainer, messageInput, token, profilePic
 
         let currentIndex = 0;
         if (data && data.length > 0) {
-            const typingSpeed = 5; // Adjust typing speed here
+            const typingSpeed = 1; // Adjust typing speed here
             function typeCharacter() {
                 if (currentIndex < data.length) {
                     const nextChar = data[currentIndex];
