@@ -17,12 +17,31 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     try {
+        const urlParams = new URLSearchParams(window.location.search);
+        let token = urlParams.get('access_token');
+        if (token) {
+            // Store the token in localStorage
+            localStorage.setItem('jwt', token);
+    
+            // Optionally, clean up the URL by removing the token
+            const cleanUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState(null, null, cleanUrl);
+    
+            // Show a success message
+            Swal.fire({
+                title: 'Welcome!',
+                text: 'Login successful via Facebook!',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                timer: 3000,
+            });
+        }
         // Set current date
         if(date)
             date.textContent = dateTime();
 
         // Retrieve token
-        const token = await getToken();
+        token = await getToken();
         const moodLogs = await getWeeklyMoodLogs(token);
         if (moodLogs?.data && Array.isArray(moodLogs.data) && moodLogs.data.length > 0) {
             // Access the last mood log
