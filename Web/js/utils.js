@@ -51,3 +51,30 @@ export function showModal(isSuccess, message) {
     }    
 }
 
+export function onSignIn(googleUser) {
+    var profile = googleUser.getBasicProfile();
+    $("#name").text(profile.getName());
+    $("#email").text(profile.getEmail);
+    $("#image").attr('src', profile.getImageUrl());
+    $(".data").css("display", "block");
+    $(".g-signin2").css("display","none");
+}
+
+export function signOut() {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+        Swal.fire({
+            title: 'Sign Out!',
+            text: `You ve signed out successfully`,
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 3000,  // Close modal after 3 seconds
+            willClose: () => {
+                location.href = '/Web/dashboard.html';  // Redirect after modal closes
+            }
+        });
+    });
+    $(".g-signin2").css("display","block");
+    $(".data").css("display", "none");
+
+}

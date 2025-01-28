@@ -243,6 +243,8 @@ main .date {
   margin-top: 1rem;
   padding: 0.5rem 1.6rem;
   font-size: large;
+  width: 110px;
+  margin-bottom: 10px;
 }
 
 main .date input[type="date"] {

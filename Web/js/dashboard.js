@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const dateofLastMoodLog = document.querySelector(".last-log");
     const update = document.querySelector("#updateContainer");
     const journal = document.querySelector("#journal");
+    const tableBody = document.querySelector("#table-body");
 
 
     try {
@@ -160,6 +161,46 @@ document.addEventListener("DOMContentLoaded", async () => {
             }   
         }
 
+        //======================================mood section==================================================================
+        if(tableBody)
+        {
+            tableBody.innerHTML = "";
+            const moodData = await fetchJournals(token);
+            if(moodData.status)
+            {
+                const data = moodData.data.data;
+                console.log(data);
+
+                if(data && Array.isArray(data) && data.length > 0)
+                {
+                    for(let serial = 0; serial < data.length; serial++)
+                    {
+                        const row = document.createElement("tr");
+
+                        const sN = document.createElement("td");
+                        sN.textContent = serial + 1;
+
+                        const title = document.createElement("td");
+                        title.textContent = data[serial].title;
+
+                        const content = document.createElement("td");
+                        content.textContent = data[serial].content;
+
+                        const time = document.createElement("td");
+                        time.textContent = await formatDateToShort(data[serial].timestamp);
+                        time.style.justifyContent = "normal";
+
+                        row.appendChild(sN);
+                        row.appendChild(title);
+                        row.appendChild(content);
+                        row.appendChild(time);
+                        tableBody.appendChild(row);
+                    }
+
+                }
+            }
+        }
+
 
 
         // Fetch daily mood messages
@@ -247,6 +288,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             journal.addEventListener("click", async () => {
                 await loadJournalTemplate();
                 await journalFetchandPopulation(token);
+                const date = document.querySelector("#date");
+                date.textContent = dateTime()
         
                 const journalTitle = document.querySelector("#journalTitle");
                 const addJournalBtn = document.querySelector("#addJournalBtn");
@@ -299,10 +342,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                     });
                 }
 
-                const journalList = document.querySelector(".journal-list")
+                const journalList = document.querySelector("#journalTableBody")
                 if (journalList) {
                     journalList.addEventListener("click", async (event) => {
-                        if (event.target && event.target.matches("#deleteJournalBtn")) {
+                        if (event.target && event.target.matches(".delete-btn")) {
                             const deleteJournalBtn = event.target;
                             const journalId = deleteJournalBtn.dataset.id;
                 
@@ -340,6 +383,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                     });
                 }
             });
+        }
+
+        if(logout)
+        {
+            logout.addEventListener("click", () =>{
+                localStorage.removeItem('jwt');
+                window.location.href = '/Web/index.html'
+                console.log('logged out')
+            })
         }
         
         
@@ -613,10 +665,10 @@ async function fetchMoodMessages(token, profilePics, chatWindow, messageInput) {
 
         
     }
-        const scrollElementHTML = "<main></main>";
-        chatWindow.insertAdjacentHTML("beforeend", scrollElementHTML);
-        const scrollElement = chatWindow.querySelector("main");
-        scrollElement.scrollIntoView()
+    const scrollElementHTML = "<main></main>";
+    chatWindow.insertAdjacentHTML("beforeend", scrollElementHTML);
+    const scrollElement = chatWindow.querySelector("main");
+    scrollElement.scrollIntoView()
 }
 
 

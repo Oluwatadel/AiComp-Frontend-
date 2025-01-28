@@ -46,77 +46,96 @@ export async function fetchJournals(token)
 
 export async function journalFetchandPopulation(token) {
     const journalsFetched = await fetchJournals(token);
-    const journalList = document.querySelector(".journal-list");
-
 
     if(journalsFetched.status)
     {
-        journalList.innerHTML = "";
         if(journalsFetched && Array.isArray(journalsFetched.data.data))
         {
-            const journals = journalsFetched.data.data  
+
+            const journals = journalsFetched.data.data
+
+            const journalTableBody = document.querySelector("#journalTableBody");
 
             for(let i = 0; i < journals.length; i++)
             {
-                const journalEntries = document.createElement("div");
-                journalEntries.classList.add("journal-entry");
-                journalEntries.id = "journalEntries";
+                const row = document.createElement("tr") 
+
+                // Create table cells for content, timestamp, and actions
+                const titleCell = document.createElement("td");
+                titleCell.textContent = journals[i].title;
+
+                const contentCell = document.createElement("td");
+                contentCell.textContent = journals[i].content;
+
+                const timestampCell = document.createElement("td");
+                timestampCell.textContent = await formatDateToShort(journals[i].timestamp);
+
+                const actionCell = document.createElement("td");
+
+                // Create action buttons
+                const actionButton = document.createElement('div')
                 
-
-                const journalContent = document.createElement("div");
-                journalContent.id = "journal-content";
-
-                const content = document.createElement("p");
-                content.id = content;
-                content.textContent = journals[i].content;
-                
-                const timestamp = document.createElement('span');
-                timestamp.textContent = await formatDateToShort(journals[i].timestamp);
-
-                journalContent.appendChild(content);
-                journalContent.appendChild(timestamp);
-
                 const deleteBtn = document.createElement("button");
-                deleteBtn.id = "deleteJournalBtn";
                 deleteBtn.textContent = "Delete";
+                deleteBtn.classList.add("delete-btn");
                 deleteBtn.dataset.id = journals[i].id;
-                deleteBtn.dataset.type = "journal";
+
+                actionButton.appendChild(deleteBtn);
+                actionCell.appendChild(actionButton);
 
 
-                journalEntries.appendChild(journalContent);
-                journalEntries.appendChild(deleteBtn);
-                journalEntries.style.borderRadius = "10px";
-                journalEntries.style.marginTop = "10px";
+                // Append cells to the row
+                row.appendChild(titleCell);
+                row.appendChild(contentCell);
+                row.appendChild(timestampCell);
+                row.appendChild(actionCell);
 
-                journalList.appendChild(journalEntries);
+                // Append the row to the table body
+                journalTableBody.appendChild(row);
 
-                if(i % 2 == 0)
-                {
-                    journalEntries.style.borderBottom = "2px solid #7d89eb";
-                    journalEntries.style.backgroundColor = "#f0f0f0";
-                }
+                // const journalEntries = document.createElement("div");
+                // journalEntries.classList.add("journal-entry");
+                // journalEntries.id = "journalEntries";
+                
+
+                // const journalContent = document.createElement("div");
+                // journalContent.id = "journal-content";
+
+                // const content = document.createElement("p");
+                // content.id = content;
+                // content.textContent = journals[i].content;
+                
+                // const timestamp = document.createElement('span');
+                // timestamp.textContent = await formatDateToShort(journals[i].timestamp);
+
+                // journalContent.appendChild(content);
+                // journalContent.appendChild(timestamp);
+
+                // const deleteBtn = document.createElement("button");
+                // deleteBtn.id = "deleteJournalBtn";
+                // deleteBtn.textContent = "Delete";
+                // deleteBtn.dataset.id = journals[i].id;
+                // deleteBtn.dataset.type = "journal";
+
+
+                // journalEntries.appendChild(journalContent);
+                // journalEntries.appendChild(deleteBtn);
+                // journalEntries.style.borderRadius = "10px";
+                // journalEntries.style.marginTop = "10px";
+
+                // journalList.appendChild(journalEntries);
+
+                // if(i % 2 == 0)
+                // {
+                //     journalEntries.style.borderBottom = "2px solid #7d89eb";
+                //     journalEntries.style.backgroundColor = "#f0f0f0";
+                // }
             }
             const scrollElementHTML = "<main></main>";
-            journalList.insertAdjacentHTML("beforeend", scrollElementHTML);
-            const scrollElement = journalList.querySelector("main");
+            journalTableBody.insertAdjacentHTML("beforeend", scrollElementHTML);
+            const scrollElement = journalTableBody.querySelector("main");
             scrollElement.scrollIntoView();
         }
-    }
-    else
-    {
-        const innerMessage = document.querySelector("#content");
-        const timestamp = document.querySelector("#timestamp");
-        const deleteBTN = document.querySelector("#delete");
-        timestamp.style.display = "none";
-        deleteBTN.style.display = "none";
-
-        innerMessage.style.textAlign = "center";
-        innerMessage.style.fontSize = "Large";
-        innerMessage.style.color = "Black";
-
-
-        innerMessage.textContent = "You are yet to add a journal"
-        journalList.appendChild(innerMessage);
     }
 }
 

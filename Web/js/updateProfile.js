@@ -76,21 +76,42 @@ document.addEventListener("DOMContentLoaded", async () => {
             if(!resp.ok)
             {
                 return resp.json().then(errorData => {
-                    showModal(false, errorData.message);
-                    throw new Error(errorData.message); // Propagate the error to the next .catch()
+                    Swal.fire({
+                        title: 'Oops...',
+                        text: errorData.message,
+                        icon: 'error',
+                        confirmButtonText: 'Try again',
+                        timer: 3000,  // Close modal after 3 seconds
+                        willClose: () => {
+                        }
+                    }); 
                 });
             }
             return resp.json(); // Parse response JSON on success
         })
         .then(data => {
-            showModal(true, data.message);
-            location.href = "/Web/dashboard.html";
+            Swal.fire({
+                title: 'Success!',
+                text: `${data.message}`,
+                icon: 'success',
+                confirmButtonText: 'OK',
+                timer: 3000,  // Close modal after 3 seconds
+                willClose: () => {
+                   location.href = '/Web/dashboard.html';  // Redirect after modal closes
+                }
         })
         .catch(error => {
             errorDisplay.textContent = error.message;
             errorDisplay.style.color = "red";
-            showModal(true, error.message);
-            console.error("Error: Something went wrong"); // Log any error that occurs
+            Swal.fire({
+                title: 'Oops...',
+                text: error.message,
+                icon: 'error',
+                confirmButtonText: 'Try again',
+                timer: 3000,  // Close modal after 3 seconds
+                willClose: () => {
+                }
+            });
         });
     })
 
@@ -107,5 +128,5 @@ document.addEventListener("DOMContentLoaded", async () => {
             reader.readAsDataURL(file)
         }
     })
-
+})
 })

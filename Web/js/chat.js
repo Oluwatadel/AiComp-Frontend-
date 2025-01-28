@@ -147,9 +147,6 @@ async function sendButtonFunction(chatContainer, messageInput, token, profilePic
         const responseData = await response.text();
         const responseJson = JSON.parse(responseData)
         const data = responseJson.data
-        console.log(data.length)
-        console.log(typeof(data))
-
         let currentIndex = 0;
         if (data && data.length > 0) {
             const typingSpeed = 1; // Adjust typing speed here

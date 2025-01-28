@@ -9,6 +9,7 @@
             let registerBTN = document.querySelector("#create-account");
             const fbButton = document.querySelector('#Facebook');
             const googleButton = document.querySelector('#Google');
+            
 
                     
             let loginUserName = document.querySelector(".input100.email");
@@ -109,35 +110,25 @@
                     console.error("Login form not found");
                 }
             
-                registerBTN.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    window.location.href = "/Web/registration.html"
-                });
+                if(registerBTN)
+                {
+                    registerBTN.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        window.location.href = "/Web/registration.html"
+                    });
+                }
 
             fbButton.addEventListener('click', async () => {
                 window.location.href = "https://localhost:7173/api/auth/signin-facebook";
             });
 
-            googleButton.addEventListener('click', async () => {
-                google.accounts.id.prompt(); 
-            });
+            // googleButton.addEventListener('click', async () => {
+            //     google.accounts.id.prompt(); 
+            // });
 
             google.accounts.id.initialize({
                 client_id: "647026979906-etoigr5rren7b9t3edt5ijp208qjj8st.apps.googleusercontent.com",
                 callback: handleCredentialResponse
-            });
-
-            navigator.credentials.get({
-                identity: {
-                    providers: [{
-                        configURL: 'https://accounts.google.com/.well-known/fedcm.json',
-                        clientId: '647026979906-etoigr5rren7b9t3edt5ijp208qjj8st.apps.googleusercontent.com'
-                    }]
-                }
-            }).then(credential => {
-                console.log('Credential retrieved successfully:', credential);
-            }).catch(error => {
-                console.error('Error retrieving credential:', error);
             });
 
             function handleCredentialResponse(response) {

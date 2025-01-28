@@ -75,3 +75,13 @@ button {
     button:hover {
         background-color: #0056b3;
     }
+
+.data{
+    display: none;
+}
+
+.g-signin2{
+    position: absolute;
+    top: 50%;
+    left: 67%
+}
